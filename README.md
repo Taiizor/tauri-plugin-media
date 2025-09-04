@@ -81,12 +81,41 @@ await mediaControls.stop();
 // Update position
 await mediaControls.updatePosition(30); // seconds
 
+// Get system media info (NEW)
+const metadata = await mediaControls.getMetadata();
+const playbackInfo = await mediaControls.getPlaybackInfo();
+const status = await mediaControls.getPlaybackStatus();
+const position = await mediaControls.getPosition();
+const isEnabled = await mediaControls.isEnabled();
+
+// metadata returns:
+// {
+//   title: string,
+//   artist?: string,
+//   album?: string,
+//   albumArtist?: string,
+//   artworkUrl?: string,
+//   duration?: number
+// }
+
+// playbackInfo returns:
+// {
+//   status: PlaybackStatus,
+//   position: number,
+//   shuffle: boolean,
+//   repeatMode: RepeatMode,
+//   playbackRate: number
+// }
+```
+
 ## Platform-Specific Implementation Details
 
 ### Windows
 - Uses Windows System Media Transport Controls (SMTC)
 - Full integration with Windows 10/11 media overlay
 - Supports timeline scrubbing and playback rate control
+- **NEW:** Uses GlobalSystemMediaTransportControlsSessionManager to read system-wide media state
+- Can detect and retrieve media info from any playing app (Spotify, Chrome, Edge, VLC, etc.)
 
 ### macOS
 - Uses MPNowPlayingInfoCenter and MPRemoteCommandCenter
@@ -110,16 +139,40 @@ npm install
 npm run tauri dev
 ```
 
+## API Reference
+
+### Set Methods
+- `initialize(appId: string, appName: string)` - Initialize the media controller
+- `updateNowPlaying(metadata: MediaMetadata, playbackInfo: PlaybackInfo)` - Update current media info
+- `play()` - Start playback
+- `pause()` - Pause playback
+- `stop()` - Stop playback
+- `togglePlayPause()` - Toggle between play and pause
+- `next()` - Skip to next track
+- `previous()` - Skip to previous track
+- `setPosition(position: number)` - Set playback position in seconds
+- `updatePosition(position: number)` - Update current position
+- `updatePlaybackStatus(status: PlaybackStatus)` - Update playback state
+- `clearNowPlaying()` - Clear all media info
+
+### Get Methods (NEW)
+- `getMetadata()` - Get current media metadata from system
+- `getPlaybackInfo()` - Get playback state (status, position, shuffle, repeat)
+- `getPlaybackStatus()` - Get current playback status
+- `getPosition()` - Get current playback position
+- `isEnabled()` - Check if media controls are available
+
 ## Development Status
 
-- Core platform abstractions implemented
-- Windows SMTC integration
-- macOS MPNowPlayingInfoCenter integration  
-- Linux MPRIS integration
-- TypeScript/JavaScript API
-- Example application
-- Event callbacks from OS to app (partial implementation)
-- Advanced features (playlists, queue management)
+- ✅ Core platform abstractions implemented
+- ✅ Windows SMTC integration with system-wide media reading
+- ✅ macOS MPNowPlayingInfoCenter integration  
+- ✅ Linux MPRIS integration
+- ✅ TypeScript/JavaScript API
+- ✅ Example application
+- ✅ Get methods for reading system media state
+- ⚠️ Event callbacks from OS to app (partial implementation)
+- ⏳ Advanced features (playlists, queue management)
 
 ## Requirements
 
