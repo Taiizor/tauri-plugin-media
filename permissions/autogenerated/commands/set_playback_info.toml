@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-set-playback-info"
+description = "Enables the set_playback_info command without any pre-configured scope."
+commands.allow = ["set_playback_info"]
+
+[[permission]]
+identifier = "deny-set-playback-info"
+description = "Denies the set_playback_info command without any pre-configured scope."
+commands.deny = ["set_playback_info"]

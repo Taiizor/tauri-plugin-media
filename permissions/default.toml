@@ -1,0 +1,16 @@
+[default]
+description = "Default permissions for the plugin"
+permissions = [
+  "allow-ping",
+  "allow-initialize-session",
+  "allow-set-metadata",
+  "allow-set-playback-info",
+  "allow-set-playback-status",
+  "allow-set-position",
+  "allow-clear-metadata",
+  "allow-get-metadata",
+  "allow-get-playback-info",
+  "allow-get-playback-status",
+  "allow-get-position",
+  "allow-is-enabled"
+]
