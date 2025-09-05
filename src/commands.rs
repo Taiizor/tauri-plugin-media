@@ -5,14 +5,6 @@ use crate::MediaExt;
 use crate::Result;
 
 #[command]
-pub(crate) async fn ping<R: Runtime>(
-    app: AppHandle<R>,
-    payload: PingRequest,
-) -> Result<PingResponse> {
-    app.media().ping(payload)
-}
-
-#[command]
 pub(crate) async fn initialize_session<R: Runtime>(
     app: AppHandle<R>,
     request: InitializeMediaSessionRequest,

@@ -4,7 +4,6 @@ Default permissions for the plugin
 
 #### This default permission set includes the following:
 
-- `allow-ping`
 - `allow-initialize-session`
 - `allow-set-metadata`
 - `allow-set-playback-info`
@@ -204,32 +203,6 @@ Enables the is_enabled command without any pre-configured scope.
 <td>
 
 Denies the is_enabled command without any pre-configured scope.
-
-</td>
-</tr>
-
-<tr>
-<td>
-
-`media:allow-ping`
-
-</td>
-<td>
-
-Enables the ping command without any pre-configured scope.
-
-</td>
-</tr>
-
-<tr>
-<td>
-
-`media:deny-ping`
-
-</td>
-<td>
-
-Denies the ping command without any pre-configured scope.
 
 </td>
 </tr>

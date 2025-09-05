@@ -23,12 +23,6 @@ pub struct Media<R: Runtime> {
 }
 
 impl<R: Runtime> Media<R> {
-    pub fn ping(&self, payload: PingRequest) -> crate::Result<PingResponse> {
-        Ok(PingResponse {
-            value: payload.value,
-        })
-    }
-
     pub fn initialize_session(&self, request: InitializeMediaSessionRequest) -> crate::Result<()> {
         let mut controller = self.controller.lock().unwrap();
         controller

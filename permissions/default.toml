@@ -1,7 +1,6 @@
 [default]
 description = "Default permissions for the plugin"
 permissions = [
-  "allow-ping",
   "allow-initialize-session",
   "allow-set-metadata",
   "allow-set-playback-info",

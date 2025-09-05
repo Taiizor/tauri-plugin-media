@@ -2121,10 +2121,10 @@
           "markdownDescription": "Denies the unminimize command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`\n- `allow-initialize-session`\n- `allow-set-metadata`\n- `allow-set-playback-info`\n- `allow-set-playback-status`\n- `allow-set-position`\n- `allow-clear-metadata`\n- `allow-get-metadata`\n- `allow-get-playback-info`\n- `allow-get-playback-status`\n- `allow-get-position`\n- `allow-is-enabled`",
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-initialize-session`\n- `allow-set-metadata`\n- `allow-set-playback-info`\n- `allow-set-playback-status`\n- `allow-set-position`\n- `allow-clear-metadata`\n- `allow-get-metadata`\n- `allow-get-playback-info`\n- `allow-get-playback-status`\n- `allow-get-position`\n- `allow-is-enabled`",
           "type": "string",
           "const": "media:default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-ping`\n- `allow-initialize-session`\n- `allow-set-metadata`\n- `allow-set-playback-info`\n- `allow-set-playback-status`\n- `allow-set-position`\n- `allow-clear-metadata`\n- `allow-get-metadata`\n- `allow-get-playback-info`\n- `allow-get-playback-status`\n- `allow-get-position`\n- `allow-is-enabled`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-initialize-session`\n- `allow-set-metadata`\n- `allow-set-playback-info`\n- `allow-set-playback-status`\n- `allow-set-position`\n- `allow-clear-metadata`\n- `allow-get-metadata`\n- `allow-get-playback-info`\n- `allow-get-playback-status`\n- `allow-get-position`\n- `allow-is-enabled`"
         },
         {
           "description": "Enables the clear_metadata command without any pre-configured scope.",
@@ -2167,12 +2167,6 @@
           "type": "string",
           "const": "media:allow-is-enabled",
           "markdownDescription": "Enables the is_enabled command without any pre-configured scope."
-        },
-        {
-          "description": "Enables the ping command without any pre-configured scope.",
-          "type": "string",
-          "const": "media:allow-ping",
-          "markdownDescription": "Enables the ping command without any pre-configured scope."
         },
         {
           "description": "Enables the set_metadata command without any pre-configured scope.",
@@ -2239,12 +2233,6 @@
           "type": "string",
           "const": "media:deny-is-enabled",
           "markdownDescription": "Denies the is_enabled command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the ping command without any pre-configured scope.",
-          "type": "string",
-          "const": "media:deny-ping",
-          "markdownDescription": "Denies the ping command without any pre-configured scope."
         },
         {
           "description": "Denies the set_metadata command without any pre-configured scope.",
