@@ -473,23 +473,26 @@
   }
   
   .control-btn {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1.5rem;
     width: 60px;
     height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.5rem;
+    color: #fff;
   }
   
   .control-btn.large {
     width: 80px;
     height: 80px;
     font-size: 2rem;
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.5);
   }
   
   .control-btn.small {
@@ -499,13 +502,15 @@
   }
   
   .control-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.2);
     transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.3);
   }
   
   .control-btn.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-color: transparent;
+    color: #fff;
   }
   
   .volume-control {

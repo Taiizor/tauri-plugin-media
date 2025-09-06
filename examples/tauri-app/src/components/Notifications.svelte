@@ -47,15 +47,16 @@
   }
   
   .notification {
-    background: white;
+    background: rgba(30, 30, 40, 0.95);
     padding: 1rem 1.25rem;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     border-left: 3px solid;
     animation: slideIn 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   @keyframes slideIn {
@@ -76,6 +77,6 @@
   .notification-message {
     flex: 1;
     font-size: 0.95rem;
-    color: #333;
+    color: #fff;
   }
 </style>
