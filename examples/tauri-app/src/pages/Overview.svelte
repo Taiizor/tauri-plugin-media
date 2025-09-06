@@ -149,19 +149,25 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
   
   .page-header p {
     font-size: 1.2rem;
-    color: #666;
+    color: #a0a0a0;
   }
   
   .quick-start {
-    background: white;
-    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     padding: 2rem;
-    margin-bottom: 3rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 2rem;
   }
   
   .quick-start h2 {
     margin-bottom: 1.5rem;
+  }
+  
+  .quick-start h3 {
+    margin-bottom: 1rem;
+    color: #fff;
   }
   
   .init-section {
@@ -215,11 +221,12 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
   }
   
   .feature-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
   }
   
   .feature-card:hover {
@@ -233,22 +240,23 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
     margin-bottom: 1rem;
   }
   
-  .feature-card h3 {
-    margin-bottom: 0.5rem;
-    color: #333;
+  .info-card h3 {
+    color: #60a5fa;
+    margin-bottom: 0.75rem;
   }
   
-  .feature-card p {
-    color: #666;
-    line-height: 1.5;
+  .info-card p {
+    color: #93c5fd;
+    line-height: 1.6;
   }
   
   .platform-support {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 3rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   
   .platforms {
@@ -278,22 +286,25 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
   }
   
   .code-example {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   
   .code-example h2 {
     margin-bottom: 1.5rem;
   }
   
-  pre {
-    background: #1e1e1e;
-    color: #d4d4d4;
-    padding: 1.5rem;
+  .code-block {
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    padding: 1rem;
     border-radius: 8px;
     overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   code {

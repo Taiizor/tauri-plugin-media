@@ -317,17 +317,16 @@
   }
   
   .subtitle {
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 2rem;
   }
   
-  .init-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  .metadata-preview {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .success-badge {
@@ -370,30 +369,28 @@
     flex-direction: column;
   }
   
-  .form-field label {
+  .form-group label {
+    display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #555;
+    color: #a0a0a0;
   }
   
-  .form-field input,
-  .form-field select {
+  .form-group input,
+  .form-group select {
+    width: 100%;
     padding: 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
     font-size: 1rem;
-    transition: border-color 0.3s ease;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
   }
   
   .form-field input:focus,
   .form-field select:focus {
     outline: none;
     border-color: #667eea;
-  }
-  
-  .form-field input[type="checkbox"] {
-    width: auto;
-    margin-right: 0.5rem;
   }
   
   .method-grid {
