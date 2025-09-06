@@ -140,18 +140,22 @@
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          metadata.artworkData = e.target.result.split(',')[1]; // Remove data:image/jpeg;base64, prefix
-          metadata.artworkUrl = null;
-          addNotification('Image loaded as base64', 'success');
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+    async function handleArtworkUpload(event) {
+      const input = event.target;
+      const file = input.files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result;
+        if (typeof result === 'string') {
+          const base64 = result.split(',')[1];
+          metadata.artworkData = base64;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    input.onchange = handleArtworkUpload;
     input.click();
   }
 </script>
@@ -321,13 +325,6 @@
     margin-bottom: 2rem;
   }
   
-  .metadata-preview {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 1rem;
-    border-radius: 6px;
-    margin-top: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
   
   .success-badge {
     background: #10b981;
@@ -369,23 +366,6 @@
     flex-direction: column;
   }
   
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #a0a0a0;
-  }
-  
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    font-size: 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
-  }
   
   .form-field input:focus,
   .form-field select:focus {

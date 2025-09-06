@@ -143,6 +143,7 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
     font-size: 2.5rem;
     margin-bottom: 1rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -165,10 +166,6 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
     margin-bottom: 1.5rem;
   }
   
-  .quick-start h3 {
-    margin-bottom: 1rem;
-    color: #fff;
-  }
   
   .init-section {
     text-align: center;
@@ -240,15 +237,6 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
     margin-bottom: 1rem;
   }
   
-  .info-card h3 {
-    color: #60a5fa;
-    margin-bottom: 0.75rem;
-  }
-  
-  .info-card p {
-    color: #93c5fd;
-    line-height: 1.6;
-  }
   
   .platform-support {
     background: rgba(255, 255, 255, 0.05);
@@ -295,16 +283,6 @@ const status = await mediaControls.getPlaybackStatus();`}</code></pre>
   
   .code-example h2 {
     margin-bottom: 1.5rem;
-  }
-  
-  .code-block {
-    background: rgba(0, 0, 0, 0.4);
-    color: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: 1rem 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   code {

@@ -191,6 +191,17 @@
     await updateMediaSession();
   }
   
+  async function selectTrack(index) {
+    currentTrackIndex = index;
+    currentTrack = tracks[index];
+    currentTime = 0;
+    
+    await updateMediaSession();
+    if (isPlaying) {
+      await play();
+    }
+  }
+  
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -230,6 +241,15 @@
         <div 
           class="progress-bar"
           on:click={seek}
+          on:keydown={(e) => {
+            if (e.key === 'ArrowLeft') {
+              currentTime = Math.max(0, currentTime - 5);
+              if (initialized) mediaControls.updatePosition(currentTime);
+            } else if (e.key === 'ArrowRight') {
+              currentTime = Math.min(currentTrack.duration, currentTime + 5);
+              if (initialized) mediaControls.updatePosition(currentTime);
+            }
+          }}
           role="slider"
           tabindex="0"
           aria-label="Seek"
@@ -310,15 +330,10 @@
       <ul>
         {#each tracks as track, index}
           <li>
-            <button 
+            <button
               class="playlist-item"
               class:active={index === currentTrackIndex}
-              on:click={() => {
-                currentTrackIndex = index;
-                currentTime = 0;
-                updateMediaSession();
-                if (isPlaying) play();
-              }}
+              on:click={() => selectTrack(index)}
             >
               <img src={track.artwork} alt="Track artwork" />
               <div class="track-details">
