@@ -1,12 +1,15 @@
 [package]
 name = "tauri-plugin-media"
 version = "0.1.0"
-authors = [ "Taiizor" ]
-description = ""
+authors = [ "Taiizor <taiizor@vegalya.com>" ]
+description = "A Tauri v2 plugin for integrating system media controls (Now Playing / MPRIS / SMTC) across Windows, macOS, and Linux."
 edition = "2021"
 rust-version = "1.77.2"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-media"
+license = "MIT"
+repository = "https://github.com/Taiizor/tauri-plugin-media"
+readme = "README.md"
 
 [dependencies]
 tauri = { version = "2.8.2" }
