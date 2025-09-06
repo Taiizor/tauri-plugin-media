@@ -160,11 +160,64 @@ export class MediaControls {
 
   async stop(): Promise<void> {
     await setPlaybackStatus(PlaybackStatus.Stopped);
-    await clearMetadata();
+  }
+
+  async togglePlayPause(): Promise<void> {
+    const status = await getPlaybackStatus();
+    if (status === PlaybackStatus.Playing) {
+      await this.pause();
+    } else {
+      await this.play();
+    }
+  }
+
+  async next(): Promise<void> {
+    await invoke('plugin:media|next');
+  }
+
+  async previous(): Promise<void> {
+    await invoke('plugin:media|previous');
+  }
+
+  async setPosition(position: number): Promise<void> {
+    await setPosition(position);
   }
 
   async updatePosition(position: number): Promise<void> {
     await setPosition(position);
+  }
+
+  async updatePlaybackStatus(status: PlaybackStatus): Promise<void> {
+    await setPlaybackStatus(status);
+  }
+
+  async clearNowPlaying(): Promise<void> {
+    await clearMetadata();
+  }
+
+  async getMetadata(): Promise<MediaMetadata | null> {
+    return await invoke('plugin:media|get_metadata');
+  }
+
+  async getPlaybackInfo(): Promise<PlaybackInfo | null> {
+    return await invoke('plugin:media|get_playback_info');
+  }
+
+  async getPlaybackStatus(): Promise<PlaybackStatus> {
+    return await invoke('plugin:media|get_playback_status');
+  }
+
+  async getPosition(): Promise<number> {
+    return await invoke('plugin:media|get_position');
+  }
+
+  async isEnabled(): Promise<boolean> {
+    return await invoke('plugin:media|is_enabled');
+  }
+
+  setEventHandler(handler: ((event: MediaControlEvent) => void) | null): void {
+    // This would need actual event listener implementation
+    console.warn('Event handler not yet implemented');
   }
 
   async clear(): Promise<void> {

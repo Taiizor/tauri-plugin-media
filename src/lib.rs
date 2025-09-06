@@ -44,6 +44,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::get_playback_status,
             commands::get_position,
             commands::is_enabled,
+            commands::next,
+            commands::previous,
         ])
         .setup(|app, api| {
             #[cfg(desktop)]

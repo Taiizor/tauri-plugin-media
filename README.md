@@ -129,7 +129,15 @@ const isEnabled = await mediaControls.isEnabled();
 
 ## Example App
 
-An example Tauri app is included in the `examples/tauri-app` directory demonstrating full media control integration with a functional music player UI.
+A comprehensive example Tauri app is included in the `examples/tauri-app` directory with a modern multi-page interface demonstrating all plugin features.
+
+### Example App Pages:
+- **Overview** - Plugin introduction and quick start guide
+- **Media Player** - Full-featured media player with playlist support
+- **Set Methods** - Interactive testing of all set methods
+- **Get Methods** - Real-time display of system media state
+- **System Monitor** - Monitor media from all system applications
+- **Events** - Media control event handling and simulation
 
 To run the example:
 

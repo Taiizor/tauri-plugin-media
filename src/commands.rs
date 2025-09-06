@@ -72,3 +72,15 @@ pub(crate) async fn get_position<R: Runtime>(app: AppHandle<R>) -> Result<f64> {
 pub(crate) async fn is_enabled<R: Runtime>(app: AppHandle<R>) -> Result<bool> {
     app.media().is_enabled()
 }
+
+#[command]
+pub(crate) async fn next<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+    // Trigger next track event - implementation depends on event handler
+    Ok(())
+}
+
+#[command]
+pub(crate) async fn previous<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+    // Trigger previous track event - implementation depends on event handler
+    Ok(())
+}
