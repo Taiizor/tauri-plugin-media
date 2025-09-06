@@ -217,15 +217,15 @@ impl super::MediaController for WindowsMediaController {
                 }
             } else if let Some(artwork_data) = &metadata.artwork_data {
                 // Create a stream from raw image data
-                use windows::Storage::Streams::{InMemoryRandomAccessStream, DataWriter};
-                
+                use windows::Storage::Streams::{DataWriter, InMemoryRandomAccessStream};
+
                 let stream = InMemoryRandomAccessStream::new()?;
                 let writer = DataWriter::CreateDataWriter(&stream)?;
                 writer.WriteBytes(artwork_data)?;
                 writer.StoreAsync()?.get()?;
                 writer.FlushAsync()?.get()?;
                 writer.DetachStream()?;
-                
+
                 stream.Seek(0)?;
                 let stream_ref = RandomAccessStreamReference::CreateFromStream(&stream)?;
                 updater.SetThumbnail(&stream_ref)?;
@@ -384,18 +384,19 @@ impl super::MediaController for WindowsMediaController {
                     let artist = media_properties.Artist()?.to_string();
                     let album_artist = media_properties.AlbumArtist()?.to_string();
                     let album_title = media_properties.AlbumTitle()?.to_string();
-                    
+
                     // Try to get artwork
                     let mut artwork_data = None;
                     if let Ok(thumbnail) = media_properties.Thumbnail() {
                         if let Ok(stream) = thumbnail.OpenReadAsync()?.get() {
                             use windows::Storage::Streams::DataReader;
-                            
+
                             let size = stream.Size()?;
-                            if size > 0 && size < 10_000_000 { // Limit to 10MB
+                            if size > 0 && size < 10_000_000 {
+                                // Limit to 10MB
                                 let reader = DataReader::CreateDataReader(&stream)?;
                                 reader.LoadAsync(size as u32)?.get()?;
-                                
+
                                 let mut buffer = vec![0u8; size as usize];
                                 reader.ReadBytes(&mut buffer)?;
                                 artwork_data = Some(buffer);

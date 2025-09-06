@@ -268,11 +268,29 @@ impl LinuxMediaController {
                 );
             }
 
+            // Handle artwork - MPRIS primarily uses URLs
             if let Some(artwork_url) = &meta.artwork_url {
                 metadata.insert(
                     "mpris:artUrl".to_string(),
                     Variant(Box::new(artwork_url.clone()) as Box<dyn dbus::arg::RefArg>),
                 );
+            } else if let Some(artwork_data) = &meta.artwork_data {
+                // For raw image data, we need to save it temporarily and provide a file:// URL
+                // This is a simplified approach - in production you might want to use a proper temp file
+                use std::fs;
+                use std::path::PathBuf;
+
+                let temp_dir = std::env::temp_dir();
+                let artwork_path = temp_dir.join(format!("mpris_artwork_{}.jpg", self.app_id));
+
+                // Decode base64 if needed (artwork_data is already Vec<u8>)
+                if let Ok(_) = fs::write(&artwork_path, artwork_data) {
+                    let file_url = format!("file://{}", artwork_path.display());
+                    metadata.insert(
+                        "mpris:artUrl".to_string(),
+                        Variant(Box::new(file_url) as Box<dyn dbus::arg::RefArg>),
+                    );
+                }
             }
         }
 
@@ -417,8 +435,93 @@ impl super::MediaController for LinuxMediaController {
     }
 
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
-        // Linux'ta MPRIS üzerinden artwork bilgisi alınabilir ama şu an implementasyon yok
-        // TODO: MPRIS'ten artwork bilgisi al
+        // Linux'ta DBus üzerinden diğer media player'lardan bilgi almak için
+        // org.mpris.MediaPlayer2.* servislerini sorgulamamız gerekiyor
+        #[cfg(target_os = "linux")]
+        {
+            if let Some(conn) = &self.connection {
+                // List all MPRIS players
+                let proxy = conn.with_proxy(
+                    "org.freedesktop.DBus",
+                    "/",
+                    std::time::Duration::from_millis(500),
+                );
+                use dbus::blocking::stdintf::org_freedesktop_dbus::Peer;
+
+                if let Ok(names) = proxy.list_names() {
+                    for name in names {
+                        if name.starts_with("org.mpris.MediaPlayer2.")
+                            && !name.contains(&self.app_id)
+                        {
+                            // Found another media player, try to get its metadata
+                            let player_proxy = conn.with_proxy(
+                                &name,
+                                "/org/mpris/MediaPlayer2",
+                                std::time::Duration::from_millis(500),
+                            );
+
+                            use dbus::blocking::stdintf::org_freedesktop_dbus::Properties;
+                            if let Ok(metadata_variant) =
+                                player_proxy.get("org.mpris.MediaPlayer2.Player", "Metadata")
+                            {
+                                if let Ok(metadata) = metadata_variant.0.as_iter() {
+                                    let mut title = None;
+                                    let mut artist = None;
+                                    let mut album = None;
+                                    let mut artwork_url = None;
+
+                                    for (key, value) in metadata {
+                                        if let Some(key_str) = key.as_str() {
+                                            match key_str {
+                                                "xesam:title" => {
+                                                    if let Some(v) = value.as_str() {
+                                                        title = Some(v.to_string());
+                                                    }
+                                                }
+                                                "xesam:artist" => {
+                                                    if let Some(arr) = value.as_iter() {
+                                                        if let Some(first) = arr.next() {
+                                                            if let Some(v) = first.1.as_str() {
+                                                                artist = Some(v.to_string());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                "xesam:album" => {
+                                                    if let Some(v) = value.as_str() {
+                                                        album = Some(v.to_string());
+                                                    }
+                                                }
+                                                "mpris:artUrl" => {
+                                                    if let Some(v) = value.as_str() {
+                                                        artwork_url = Some(v.to_string());
+                                                    }
+                                                }
+                                                _ => {}
+                                            }
+                                        }
+                                    }
+
+                                    if title.is_some() || artist.is_some() {
+                                        return Ok(Some(MediaMetadata {
+                                            title: title.unwrap_or_else(|| "Unknown".to_string()),
+                                            artist,
+                                            album,
+                                            album_artist: None,
+                                            artwork_url,
+                                            artwork_data: None, // MPRIS doesn't provide raw data
+                                            duration: None,
+                                        }));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Fall back to our own metadata
         Ok(self.metadata.clone())
     }
 

@@ -136,6 +136,29 @@ impl super::MediaController for MacOSMediaController {
                     info.push((duration_key, duration_value));
                 }
 
+                // Artwork
+                // Note: MPMediaItemPropertyArtwork requires creating an MPMediaItemArtwork object
+                // For simplicity, we're storing the URL or data path
+                if let Some(artwork_url) = &metadata.artwork_url {
+                    let artwork_key =
+                        NSString::alloc(nil).init_str("MPMediaItemPropertyArtworkURL");
+                    let artwork_value = NSString::alloc(nil).init_str(artwork_url);
+                    info.push((artwork_key, artwork_value));
+                } else if let Some(artwork_data) = &metadata.artwork_data {
+                    // For binary data, save to temp file and use file URL
+                    use std::fs;
+                    let temp_dir = std::env::temp_dir();
+                    let artwork_path = temp_dir.join("macos_artwork.jpg");
+
+                    if let Ok(_) = fs::write(&artwork_path, artwork_data) {
+                        let file_url = format!("file://{}", artwork_path.display());
+                        let artwork_key =
+                            NSString::alloc(nil).init_str("MPMediaItemPropertyArtworkURL");
+                        let artwork_value = NSString::alloc(nil).init_str(&file_url);
+                        info.push((artwork_key, artwork_value));
+                    }
+                }
+
                 // Create dictionary
                 let keys: Vec<id> = info.iter().map(|(k, _)| *k).collect();
                 let values: Vec<id> = info.iter().map(|(_, v)| *v).collect();
@@ -294,8 +317,81 @@ impl super::MediaController for MacOSMediaController {
     }
 
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
-        // macOS'ta MPNowPlayingInfoCenter üzerinden artwork bilgisi alınabilir ama şu an implementasyon yok
-        // TODO: MPNowPlayingInfoCenter'dan artwork bilgisi al
+        #[cfg(target_os = "macos")]
+        unsafe {
+            // Get current now playing info from the system
+            let info_center = Self::get_info_center();
+            let now_playing_info: id = msg_send![info_center, nowPlayingInfo];
+
+            if now_playing_info != nil {
+                // Extract metadata from NSDictionary
+                let title_key = NSString::alloc(nil).init_str("MPMediaItemPropertyTitle");
+                let title: id = msg_send![now_playing_info, objectForKey: title_key];
+
+                if title != nil {
+                    let title_str = CStr::from_ptr(msg_send![title, UTF8String])
+                        .to_string_lossy()
+                        .into_owned();
+
+                    let mut metadata = MediaMetadata {
+                        title: title_str,
+                        artist: None,
+                        album: None,
+                        album_artist: None,
+                        duration: None,
+                        artwork_url: None,
+                        artwork_data: None,
+                    };
+
+                    // Get artist
+                    let artist_key = NSString::alloc(nil).init_str("MPMediaItemPropertyArtist");
+                    let artist: id = msg_send![now_playing_info, objectForKey: artist_key];
+                    if artist != nil {
+                        metadata.artist = Some(
+                            CStr::from_ptr(msg_send![artist, UTF8String])
+                                .to_string_lossy()
+                                .into_owned(),
+                        );
+                    }
+
+                    // Get album
+                    let album_key = NSString::alloc(nil).init_str("MPMediaItemPropertyAlbumTitle");
+                    let album: id = msg_send![now_playing_info, objectForKey: album_key];
+                    if album != nil {
+                        metadata.album = Some(
+                            CStr::from_ptr(msg_send![album, UTF8String])
+                                .to_string_lossy()
+                                .into_owned(),
+                        );
+                    }
+
+                    // Get artwork URL if available
+                    let artwork_key =
+                        NSString::alloc(nil).init_str("MPMediaItemPropertyArtworkURL");
+                    let artwork: id = msg_send![now_playing_info, objectForKey: artwork_key];
+                    if artwork != nil {
+                        metadata.artwork_url = Some(
+                            CStr::from_ptr(msg_send![artwork, UTF8String])
+                                .to_string_lossy()
+                                .into_owned(),
+                        );
+                    }
+
+                    // Get duration
+                    let duration_key =
+                        NSString::alloc(nil).init_str("MPMediaItemPropertyPlaybackDuration");
+                    let duration: id = msg_send![now_playing_info, objectForKey: duration_key];
+                    if duration != nil {
+                        let duration_val: f64 = msg_send![duration, doubleValue];
+                        metadata.duration = Some(duration_val);
+                    }
+
+                    return Ok(Some(metadata));
+                }
+            }
+        }
+
+        // Fall back to our own metadata
         Ok(self.metadata.clone())
     }
 
