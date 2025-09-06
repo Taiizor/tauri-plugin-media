@@ -252,16 +252,17 @@
   }
   
   .subtitle {
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 2rem;
   }
   
   .control-panel {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -322,10 +323,11 @@
   }
   
   .simulator {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     height: fit-content;
   }
   
@@ -334,7 +336,7 @@
   }
   
   .simulator p {
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 1rem;
     font-size: 0.9rem;
   }
@@ -347,24 +349,26 @@
   
   .sim-btn {
     padding: 0.75rem;
-    background: #f3f4f6;
-    border: 1px solid #e5e7eb;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
+    color: #fff;
   }
   
   .sim-btn:hover {
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
     transform: translateY(-2px);
   }
   
   .event-log {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     max-height: 600px;
     display: flex;
     flex-direction: column;
@@ -378,11 +382,11 @@
   }
   
   .event-count {
-    background: #f3f4f6;
+    background: rgba(255, 255, 255, 0.1);
     padding: 0.25rem 0.75rem;
     border-radius: 12px;
     font-size: 0.875rem;
-    color: #666;
+    color: #a0a0a0;
   }
   
   .events-list {
@@ -402,14 +406,14 @@
     grid-template-columns: 40px 1fr auto;
     gap: 1rem;
     padding: 1rem;
-    background: #f9fafb;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
     border-left: 3px solid;
     transition: all 0.3s ease;
   }
   
   .event-item:hover {
-    background: #f3f4f6;
+    background: rgba(255, 255, 255, 0.08);
     transform: translateX(2px);
   }
   
@@ -433,7 +437,7 @@
   
   .event-time {
     font-size: 0.8rem;
-    color: #666;
+    color: #a0a0a0;
   }
   
   .simulated-badge {
@@ -452,18 +456,19 @@
   }
   
   .event-data pre {
-    background: white;
+    background: rgba(0, 0, 0, 0.3);
     padding: 0.5rem;
     border-radius: 4px;
     font-size: 0.75rem;
     overflow-x: auto;
     margin: 0;
+    color: #fff;
   }
   
   .no-events {
     text-align: center;
     padding: 3rem;
-    color: #999;
+    color: #666;
   }
   
   .no-events-icon {
@@ -479,20 +484,20 @@
   }
   
   .info-card {
-    background: #f0f9ff;
-    border: 1px solid #bfdbfe;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     border-radius: 12px;
     padding: 1.5rem;
   }
   
   .info-card h3 {
+    color: #60a5fa;
     margin-bottom: 0.75rem;
-    color: #1e40af;
   }
   
   .info-card p,
   .info-card ul {
-    color: #1e40af;
+    color: #93c5fd;
     line-height: 1.6;
   }
   

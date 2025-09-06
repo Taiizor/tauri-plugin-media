@@ -346,7 +346,7 @@
   }
   
   .subtitle {
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 2rem;
   }
   
@@ -423,17 +423,15 @@
   
   .time {
     font-size: 0.9rem;
-    color: #666;
-    min-width: 45px;
   }
   
   .progress-bar {
-    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
     height: 6px;
-    background: #e5e7eb;
     border-radius: 3px;
+    overflow: hidden;
     cursor: pointer;
-    position: relative;
+    margin: 1.5rem 0;
   }
   
   .progress-fill {
@@ -478,7 +476,7 @@
   }
   
   .control-btn:hover {
-    background: #f9fafb;
+    background: rgba(255, 255, 255, 0.08);
     transform: scale(1.05);
   }
   
@@ -499,10 +497,11 @@
   }
   
   .playlist {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   
   .playlist h3 {
@@ -516,13 +515,11 @@
   }
   
   .playlist-item {
-    width: 100%;
     display: flex;
     align-items: center;
-    gap: 1rem;
     padding: 0.75rem;
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -530,11 +527,13 @@
   }
   
   .playlist-item:hover {
-    background: #f9fafb;
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(4px);
   }
   
   .playlist-item.active {
-    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border-left: 3px solid #667eea;
   }
   
   .playlist-item img {

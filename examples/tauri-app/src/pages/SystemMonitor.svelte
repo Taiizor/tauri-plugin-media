@@ -275,16 +275,17 @@
   }
   
   .subtitle {
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 2rem;
   }
   
   .control-panel {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -308,8 +309,10 @@
   
   .refresh-rate select {
     padding: 0.5rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
   }
   
   .status-indicator {
@@ -354,10 +357,11 @@
   }
   
   .current-state {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
   
   .current-state h2 {
@@ -398,12 +402,12 @@
   
   .artist {
     font-size: 1.1rem;
-    color: #666;
+    color: #a0a0a0;
     margin-bottom: 0.25rem;
   }
   
   .album {
-    color: #999;
+    color: #808080;
   }
   
   .playback-bar {
@@ -431,7 +435,7 @@
   }
   
   .time {
-    color: #666;
+    color: #a0a0a0;
     font-size: 0.9rem;
     min-width: 80px;
     text-align: right;
@@ -441,20 +445,20 @@
     display: flex;
     gap: 2rem;
     padding: 1rem;
-    background: #f9fafb;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
   }
   
   .detail-item {
     font-size: 0.9rem;
-    color: #666;
+    color: #a0a0a0;
   }
   
   .no-media,
   .disabled-state {
     text-align: center;
     padding: 3rem;
-    color: #999;
+    color: #666;
   }
   
   .no-media-icon,
@@ -465,10 +469,11 @@
   }
   
   .history-panel {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     max-height: 600px;
     display: flex;
     flex-direction: column;
@@ -492,7 +497,7 @@
     gap: 0.75rem;
     align-items: center;
     padding: 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
   
   .history-item:last-child {
@@ -501,7 +506,7 @@
   
   .history-time {
     font-size: 0.8rem;
-    color: #999;
+    color: #808080;
   }
   
   .history-status {
@@ -522,7 +527,7 @@
   
   .history-artist {
     font-size: 0.85rem;
-    color: #666;
+    color: #a0a0a0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -530,14 +535,14 @@
   
   .history-position {
     font-size: 0.85rem;
-    color: #999;
+    color: #808080;
     text-align: right;
   }
   
   .no-history {
     text-align: center;
     padding: 2rem;
-    color: #999;
+    color: #666;
   }
   
   .btn {
@@ -578,19 +583,19 @@
   }
   
   .info-card {
-    background: #f0f9ff;
-    border: 1px solid #bfdbfe;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     border-radius: 12px;
     padding: 1.5rem;
   }
   
   .info-card h3 {
     margin-bottom: 0.75rem;
-    color: #1e40af;
+    color: #60a5fa;
   }
   
   .info-card p {
-    color: #1e40af;
+    color: #93c5fd;
     line-height: 1.6;
   }
 </style>
