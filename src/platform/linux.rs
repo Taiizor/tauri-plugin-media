@@ -417,6 +417,8 @@ impl super::MediaController for LinuxMediaController {
     }
 
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
+        // Linux'ta MPRIS üzerinden artwork bilgisi alınabilir ama şu an implementasyon yok
+        // TODO: MPRIS'ten artwork bilgisi al
         Ok(self.metadata.clone())
     }
 

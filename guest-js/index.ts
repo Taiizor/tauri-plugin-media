@@ -8,7 +8,7 @@ export interface MediaMetadata {
   albumArtist?: string;
   duration?: number; // Duration in seconds
   artworkUrl?: string;
-  artworkData?: number[]; // Raw image data as array of bytes
+  artworkData?: string; // Base64 encoded image data
 }
 
 // Playback status enum

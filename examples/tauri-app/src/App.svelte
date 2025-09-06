@@ -359,6 +359,19 @@
               <small>Title: {systemState.metadata.title || 'N/A'}</small>
               <small>Artist: {systemState.metadata.artist || 'N/A'}</small>
               <small>Album: {systemState.metadata.album || 'N/A'}</small>
+              {#if systemState.metadata.artworkData}
+                <img 
+                  src="data:image/jpeg;base64,{systemState.metadata.artworkData}" 
+                  alt="Artwork" 
+                  class="system-artwork"
+                />
+              {:else if systemState.metadata.artworkUrl}
+                <img 
+                  src={systemState.metadata.artworkUrl} 
+                  alt="Artwork" 
+                  class="system-artwork"
+                />
+              {/if}
             </div>
           {:else}
             <small>No metadata</small>
@@ -582,5 +595,14 @@
   
   .refresh-btn:hover {
     background: #1ed760;
+  }
+  
+  .system-artwork {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
 </style>

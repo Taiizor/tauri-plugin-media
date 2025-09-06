@@ -294,6 +294,8 @@ impl super::MediaController for MacOSMediaController {
     }
 
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
+        // macOS'ta MPNowPlayingInfoCenter üzerinden artwork bilgisi alınabilir ama şu an implementasyon yok
+        // TODO: MPNowPlayingInfoCenter'dan artwork bilgisi al
         Ok(self.metadata.clone())
     }
 

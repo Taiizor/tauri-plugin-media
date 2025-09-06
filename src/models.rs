@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -9,7 +10,41 @@ pub struct MediaMetadata {
     pub album_artist: Option<String>,
     pub duration: Option<f64>, // Duration in seconds
     pub artwork_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", with = "base64_serde")]
     pub artwork_data: Option<Vec<u8>>, // Raw image data
+}
+
+mod base64_serde {
+    use super::*;
+    use serde::{Deserializer, Serializer};
+    
+    pub fn serialize<S>(data: &Option<Vec<u8>>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match data {
+            Some(bytes) => {
+                let encoded = BASE64.encode(bytes);
+                serializer.serialize_str(&encoded)
+            }
+            None => serializer.serialize_none(),
+        }
+    }
+    
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<Vec<u8>>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: Option<String> = Option::deserialize(deserializer)?;
+        match s {
+            Some(encoded) => {
+                BASE64.decode(encoded)
+                    .map(Some)
+                    .map_err(serde::de::Error::custom)
+            }
+            None => Ok(None),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq)]
