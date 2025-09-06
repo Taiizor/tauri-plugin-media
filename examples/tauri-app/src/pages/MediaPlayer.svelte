@@ -1,9 +1,13 @@
 <script>
   import { mediaControls, PlaybackStatus, RepeatMode } from 'tauri-plugin-media-api';
-  import { mediaState, addNotification } from '../lib/stores.js';
+  import { addNotification, pluginInitialized } from '../lib/stores.js';
   import { onMount, onDestroy } from 'svelte';
   
   let initialized = false;
+  
+  pluginInitialized.subscribe(value => {
+    initialized = value;
+  });
   let currentTime = 0;
   let interval;
   

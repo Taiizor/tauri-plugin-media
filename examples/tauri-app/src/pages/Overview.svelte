@@ -1,13 +1,17 @@
 <script>
   import { mediaControls } from 'tauri-plugin-media-api';
-  import { addNotification } from '../lib/stores.js';
+  import { addNotification, pluginInitialized } from '../lib/stores.js';
   
   let initialized = false;
+  
+  pluginInitialized.subscribe(value => {
+    initialized = value;
+  });
   
   async function initializePlugin() {
     try {
       await mediaControls.initialize('tauri-media-example', 'Tauri Media Example');
-      initialized = true;
+      pluginInitialized.set(true);
       addNotification('Media plugin initialized successfully!', 'success');
     } catch (error) {
       addNotification(`Failed to initialize: ${error}`, 'error');

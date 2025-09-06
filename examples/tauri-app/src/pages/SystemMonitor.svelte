@@ -1,39 +1,53 @@
 <script>
-  import { mediaControls } from 'tauri-plugin-media-api';
-  import { systemMediaState, addNotification } from '../lib/stores.js';
   import { onMount, onDestroy } from 'svelte';
-  
+  import { mediaControls } from 'tauri-plugin-media-api';
+  import { addNotification, pluginInitialized } from '../lib/stores.js';
+
+  let enabled = false;
   let monitoring = false;
   let refreshInterval = null;
   let refreshRate = 1000;
+  let initialized = false;
   let history = [];
   let maxHistory = 10;
-  
+  let metadata = null;
+  let playbackInfo = null;
+  let status = null;
+  let position = 0;
+
+  pluginInitialized.subscribe(value => {
+    initialized = value;
+  });
+
   onMount(() => {
     fetchSystemState();
   });
-  
+
   onDestroy(() => {
     stopMonitoring();
   });
-  
+
   async function fetchSystemState() {
+    if (!initialized) {
+      addNotification('Please initialize the plugin first', 'warning');
+      return false;
+    }
+
     try {
-      const [metadata, playbackInfo, status, position, enabled] = await Promise.all([
-        mediaControls.getMetadata(),
-        mediaControls.getPlaybackInfo(),
-        mediaControls.getPlaybackStatus(),
-        mediaControls.getPosition(),
-        mediaControls.isEnabled()
-      ]);
-      
-      systemMediaState.set({
-        metadata,
-        playbackInfo,
-        status,
-        position,
-        enabled
-      });
+      enabled = await mediaControls.isEnabled();
+
+      if (!enabled) {
+        metadata = null;
+        playbackInfo = null;
+        status = null;
+        position = 0;
+        return false;
+      }
+
+      metadata = await mediaControls.getMetadata();
+      playbackInfo = await mediaControls.getPlaybackInfo();
+      status = await mediaControls.getPlaybackStatus();
+      position = await mediaControls.getPosition();
       
       // Add to history
       if (metadata || playbackInfo) {
@@ -139,71 +153,51 @@
     <div class="current-state">
       <h2>Current System Media</h2>
       
-      {#if $systemMediaState.enabled}
+      {#if enabled}
         <div class="media-card">
-          {#if $systemMediaState.metadata}
+          {#if metadata}
             <div class="media-header">
-              {#if $systemMediaState.metadata.artworkData || $systemMediaState.metadata.artworkUrl}
+              {#if metadata.artworkData || metadata.artworkUrl}
                 <div class="artwork">
-                  {#if $systemMediaState.metadata.artworkData}
+                  {#if metadata.artworkData}
                     <img 
-                      src="data:image/jpeg;base64,{$systemMediaState.metadata.artworkData}" 
+                      src="data:image/jpeg;base64,{metadata.artworkData}" 
                       alt="Artwork"
                     />
-                  {:else if $systemMediaState.metadata.artworkUrl}
-                    <img 
-                      src={$systemMediaState.metadata.artworkUrl} 
-                      alt="Artwork"
-                    />
+                  {:else if metadata.artworkUrl}
+                    <img src={metadata.artworkUrl || '/placeholder.png'} alt="Album artwork" />
                   {/if}
                 </div>
               {/if}
               
               <div class="media-info">
-                <h3>{$systemMediaState.metadata.title || 'Unknown Title'}</h3>
-                <p class="artist">{$systemMediaState.metadata.artist || 'Unknown Artist'}</p>
-                <p class="album">{$systemMediaState.metadata.album || 'Unknown Album'}</p>
+                <h3>{metadata?.title || 'Unknown Track'}</h3>
+                <div class="artist">{metadata?.artist || 'Unknown Artist'}</div>
+                <div class="album">{metadata?.album || ''}</div>
               </div>
             </div>
             
             <div class="playback-bar">
-              <span class="status-icon">
-                {#if $systemMediaState.status === 'playing'}
-                  ▶️
-                {:else if $systemMediaState.status === 'paused'}
-                  ⏸️
-                {:else}
-                  ⏹️
-                {/if}
-              </span>
+              <span class="status-icon">{status === 'playing' ? '▶️' : '⏸️'}</span>
               
               <div class="progress">
                 <div 
                   class="progress-fill"
-                  style="width: {$systemMediaState.metadata.duration ? 
-                    ($systemMediaState.position / $systemMediaState.metadata.duration) * 100 : 0}%"
+                  style="width: {metadata?.duration ? (position / metadata.duration) * 100 : 0}%"
                 ></div>
               </div>
               
-              <span class="time">
-                {formatTime($systemMediaState.position)}
-                {#if $systemMediaState.metadata.duration}
-                  / {formatTime($systemMediaState.metadata.duration)}
-                {/if}
-              </span>
+              <span class="time">{formatTime(position)}</span>
+              {#if metadata?.duration}
+                / {formatTime(metadata.duration)}
+              {/if}
             </div>
             
-            {#if $systemMediaState.playbackInfo}
+            {#if playbackInfo}
               <div class="playback-details">
-                <span class="detail-item">
-                  🔀 Shuffle: {$systemMediaState.playbackInfo.shuffle ? 'On' : 'Off'}
-                </span>
-                <span class="detail-item">
-                  🔁 Repeat: {$systemMediaState.playbackInfo.repeatMode}
-                </span>
-                <span class="detail-item">
-                  ⚡ Rate: {$systemMediaState.playbackInfo.playbackRate}x
-                </span>
+                <div class="detail-item">Shuffle: {playbackInfo.shuffle ? 'On' : 'Off'}</div>
+                <div class="detail-item">Repeat: {playbackInfo.repeatMode}</div>
+                <div class="detail-item">⚡ Rate: {playbackInfo.playbackRate}x</div>
               </div>
             {/if}
           {:else}
@@ -215,7 +209,7 @@
         </div>
       {:else}
         <div class="disabled-state">
-          <span class="disabled-icon">❌</span>
+          <span class="disabled-icon">🚫</span>
           <p>Media controls are disabled or no media player is active</p>
         </div>
       {/if}

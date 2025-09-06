@@ -1,7 +1,12 @@
 import { writable } from 'svelte/store';
+import { mediaControls } from 'tauri-plugin-media-api';
 
 // Navigation state
 export const currentPage = writable('overview');
+
+// Plugin initialization state
+export const pluginInitialized = writable(false);
+export const mediaControlsInstance = writable(mediaControls);
 
 // Media state
 export const mediaState = writable({

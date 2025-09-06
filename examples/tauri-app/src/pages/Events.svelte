@@ -1,20 +1,24 @@
 <script>
   import { mediaControls, MediaControlEventType } from 'tauri-plugin-media-api';
-  import { addNotification } from '../lib/stores.js';
+  import { addNotification, pluginInitialized } from '../lib/stores.js';
   import { onMount, onDestroy } from 'svelte';
+  import { listen } from '@tauri-apps/api/event';
   
   let events = [];
   let listening = false;
   let eventHandler = null;
   let maxEvents = 50;
   let autoScroll = true;
+  let initialized = false;
+  let unlistenFn = null;
+  
+  pluginInitialized.subscribe(value => {
+    initialized = value;
+  });
   
   onMount(async () => {
-    try {
-      await mediaControls.initialize('events-demo', 'Events Demo');
+    if (initialized) {
       addNotification('Ready to listen for events', 'info');
-    } catch (error) {
-      console.error('Failed to initialize:', error);
     }
   });
   
@@ -24,36 +28,40 @@
     }
   });
   
-  function startListening() {
-    if (eventHandler) return;
+  async function startListening() {
+    if (!initialized) {
+      addNotification('Please initialize the plugin first', 'warning');
+      return;
+    }
     
-    eventHandler = (event) => {
-      const eventEntry = {
-        id: Date.now(),
-        type: event.type,
-        timestamp: new Date(),
-        data: event
-      };
+    if (unlistenFn) return;
+    
+    try {
+      // Listen for media control events from the Rust backend
+      unlistenFn = await listen('media-control-event', (event) => {
+        const eventEntry = {
+          id: Date.now(),
+          type: event.payload?.type || 'unknown',
+          timestamp: new Date(),
+          data: event.payload,
+          isReal: true
+        };
+        
+        events = [eventEntry, ...events].slice(0, maxEvents);
+        addNotification(`Real Event: ${eventEntry.type}`, 'success');
+      });
       
-      events = [eventEntry, ...events].slice(0, maxEvents);
-      
-      // Show notification for the event
-      addNotification(`Event: ${event.type}`, 'info');
-    };
-    
-    // Note: This is a placeholder - actual event handler setup would depend on
-    // the platform-specific implementation
-    mediaControls.setEventHandler(eventHandler);
-    
-    listening = true;
-    addNotification('Started listening for media events', 'success');
+      listening = true;
+      addNotification('Started listening for real media events', 'success');
+    } catch (error) {
+      addNotification(`Failed to start listening: ${error}`, 'error');
+    }
   }
   
   function stopListening() {
-    if (eventHandler) {
-      // Remove event handler
-      mediaControls.setEventHandler(null);
-      eventHandler = null;
+    if (unlistenFn) {
+      unlistenFn();
+      unlistenFn = null;
     }
     
     listening = false;
@@ -68,13 +76,14 @@
   function simulateEvent(type) {
     const eventEntry = {
       id: Date.now(),
-      type: type,
+      type,
       timestamp: new Date(),
-      data: { type, simulated: true }
+      data: { simulated: true },
+      isReal: false
     };
     
     events = [eventEntry, ...events].slice(0, maxEvents);
-    addNotification(`Simulated ${type} event`, 'success');
+    addNotification(`Simulated: ${type}`, 'warning');
   }
   
   function formatTimestamp(date) {
