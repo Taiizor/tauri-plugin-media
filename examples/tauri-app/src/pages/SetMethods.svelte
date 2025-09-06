@@ -348,21 +348,13 @@
     gap: 2rem;
   }
   
-  .test-section {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  }
   
   .method-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 30, 40, 0.8) !important;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   }
   
   .init-card {
@@ -380,6 +372,7 @@
     margin-bottom: 1.5rem;
     color: #fff;
   }
+  
   
   .form-grid {
     display: grid;

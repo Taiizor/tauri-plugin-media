@@ -366,11 +366,12 @@
   }
   
   .warning-card {
-    background: #fef3c7;
-    color: #92400e;
+    background: rgba(254, 243, 199, 0.1);
+    color: #fbbf24;
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 2rem;
+    border: 1px solid rgba(254, 243, 199, 0.3);
   }
   
   .player {
@@ -380,11 +381,11 @@
   }
   
   .player-main {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 30, 40, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     max-width: 600px;
     margin: 0 auto 2rem;
   }
@@ -519,15 +520,16 @@
   }
   
   .playlist {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(30, 30, 40, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   }
   
   .playlist h3 {
     margin-bottom: 1rem;
+    color: #fff;
   }
   
   .playlist ul {
