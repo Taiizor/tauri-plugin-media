@@ -325,7 +325,6 @@
     margin-bottom: 2rem;
   }
   
-  
   .success-badge {
     background: #10b981;
     color: white;
@@ -336,22 +335,50 @@
     font-weight: 500;
   }
   
+  .form-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #a0a0a0;
+  }
+  
   .method-sections {
     display: flex;
     flex-direction: column;
     gap: 2rem;
   }
   
+  .test-section {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
   .method-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .init-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #fff;
   }
   
   .method-card h2 {
     margin-bottom: 1.5rem;
-    color: #333;
+    color: #fff;
   }
   
   .form-grid {
@@ -366,11 +393,43 @@
     flex-direction: column;
   }
   
+  .form-field input {
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+  }
   
-  .form-field input:focus,
+  .form-field input:focus {
+    outline: none;
+    border-color: #667eea;
+  }
+  
+  .form-field select {
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+  }
+  
+  .form-field select option {
+    background: #2a2a3a;
+    color: #fff;
+  }
+  
   .form-field select:focus {
     outline: none;
     border-color: #667eea;
+  }
+  
+  .form-field input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+    accent-color: #667eea;
   }
   
   .method-grid {

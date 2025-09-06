@@ -380,10 +380,13 @@
   }
   
   .player-main {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    margin: 0 auto 2rem;
   }
   
   .artwork-container {
@@ -414,19 +417,23 @@
   }
   
   .track-info h2 {
+    color: #fff;
+  }
+  
+  .track-info h2 {
     font-size: 1.8rem;
     margin-bottom: 0.5rem;
   }
   
   .artist {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 1.1rem;
+    color: #a0a0a0;
     margin-bottom: 0.25rem;
   }
   
   .album {
-    font-size: 1rem;
-    color: #999;
+    font-size: 0.9rem;
+    color: #808080;
   }
   
   .progress-container {
