@@ -1,7 +1,7 @@
 # Tauri Plugin Media
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Taiizor/tauri-plugin-media/blob/develop/LICENSE-MIT)
-[![License: Apache](https://img.shields.io/badge/License-Apache-yellow.svg)](https://github.com/Taiizor/tauri-plugin-media/blob/develop/LICENSE-APACHE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache-yellow.svg)](https://github.com/Taiizor/tauri-plugin-media/blob/develop/LICENSE-APACHE)
 
 An advanced system media control integration plugin for Tauri applications. This plugin provides comprehensive media playback controls, rich metadata support, and seamless integration with native operating system media interfaces. It enables your Tauri application to interact with system media controls, display now-playing information, respond to media keys, and monitor system-wide media playback from other applications. Working seamlessly on Windows, macOS, and Linux platforms, it brings professional-grade media capabilities to your Tauri applications.
 
