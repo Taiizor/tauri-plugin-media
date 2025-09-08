@@ -5,18 +5,18 @@ on:
     - cron: '0 0 * * *'
   push:
     branches:
-      - main
+      - develop
     paths:
-      - ".github/workflows/audit.yml"
       - "**/Cargo.lock"
       - "**/Cargo.toml"
+      - ".github/workflows/audit.yml"
   pull_request:
     branches:
-      - main
+      - develop
     paths:
-      - ".github/workflows/audit.yml"
       - "**/Cargo.lock"
       - "**/Cargo.toml"
+      - ".github/workflows/audit.yml"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,8 +25,11 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      checks: write
     steps:
       - uses: actions/checkout@v4
-      - uses: rustsec/audit-check@v1
+      - uses: rustsec/audit-check@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
