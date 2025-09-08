@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-media-api",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Taiizor",
   "description": "Advanced system media control integration plugin for Tauri applications with comprehensive playback controls, rich metadata support, and seamless native OS media interface integration across Windows, macOS, and Linux",
   "license": "MIT OR Apache-2.0",
