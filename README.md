@@ -60,7 +60,7 @@ Or manually add to your `Cargo.toml` file:
 ```toml
 [dependencies]
 tauri = { version = "2.8.2" }
-tauri-plugin-media = "0.1.0"
+tauri-plugin-media = "0.1.1"
 ```
 
 #### JavaScript/TypeScript API

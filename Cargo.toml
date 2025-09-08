@@ -1,13 +1,13 @@
 [package]
 name = "tauri-plugin-media"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "Taiizor <taiizor@vegalya.com>" ]
-description = "A Tauri v2 plugin for integrating system media controls (Now Playing / MPRIS / SMTC) across Windows, macOS, and Linux."
+description = "Advanced system media control integration plugin for Tauri applications with comprehensive playback controls, rich metadata support, and seamless native OS media interface integration across Windows, macOS, and Linux"
 edition = "2021"
 rust-version = "1.77.2"
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-media"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/Taiizor/tauri-plugin-media"
 readme = "README.md"
 
