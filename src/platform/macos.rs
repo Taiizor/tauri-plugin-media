@@ -1,19 +1,49 @@
 use crate::models::*;
 use std::error::Error as StdError;
+use std::ffi::CStr;
 
 #[cfg(target_os = "macos")]
 use cocoa::base::{id, nil};
 #[cfg(target_os = "macos")]
-use cocoa::foundation::{NSArray, NSDictionary, NSNumber, NSString};
+use cocoa::foundation::{NSArray, NSDictionary, NSString};
 #[cfg(target_os = "macos")]
 use core_graphics::image::CGImage;
 #[cfg(target_os = "macos")]
 use objc::{class, msg_send, runtime::Object, sel, sel_impl};
 
+// NSNumber was removed from cocoa 0.26, define helper functions
+#[cfg(target_os = "macos")]
+mod ns_number {
+    use cocoa::base::id;
+    use objc::{class, msg_send, sel, sel_impl};
+    
+    pub struct NSNumber;
+    
+    impl NSNumber {
+        pub unsafe fn alloc(_: id) -> id {
+            msg_send![class!(NSNumber), alloc]
+        }
+    }
+    
+    pub trait NSNumberExt {
+        unsafe fn init_f64(self, value: f64) -> id;
+    }
+    
+    impl NSNumberExt for id {
+        unsafe fn init_f64(self, value: f64) -> id {
+            msg_send![self, initWithDouble: value]
+        }
+    }
+}
+
+#[cfg(target_os = "macos")]
+use ns_number::{NSNumber, NSNumberExt};
+
 pub struct MacOSMediaController {
     event_handler: Option<Box<dyn Fn(MediaControlEvent) + Send>>,
     metadata: Option<MediaMetadata>,
     playback_info: Option<PlaybackInfo>,
+    initialized: bool,
 }
 
 impl MacOSMediaController {
@@ -22,6 +52,7 @@ impl MacOSMediaController {
             event_handler: None,
             metadata: None,
             playback_info: None,
+            initialized: false,
         }
     }
 
