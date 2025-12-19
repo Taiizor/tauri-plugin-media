@@ -1,14 +1,20 @@
 use crate::models::*;
 use std::error::Error as StdError;
+use std::ffi::CStr;
 
 #[cfg(target_os = "macos")]
 use cocoa::base::{id, nil};
 #[cfg(target_os = "macos")]
-use cocoa::foundation::{NSArray, NSDictionary, NSNumber, NSString};
-#[cfg(target_os = "macos")]
-use core_graphics::image::CGImage;
+use cocoa::foundation::{NSArray, NSDictionary, NSString};
 #[cfg(target_os = "macos")]
 use objc::{class, msg_send, runtime::Object, sel, sel_impl};
+
+// Helper to create NSNumber since it was removed from cocoa::foundation in 0.26+
+#[cfg(target_os = "macos")]
+unsafe fn ns_number_from_f64(value: f64) -> id {
+    let cls = class!(NSNumber);
+    msg_send![cls, numberWithDouble: value]
+}
 
 pub struct MacOSMediaController {
     event_handler: Option<Box<dyn Fn(MediaControlEvent) + Send>>,
@@ -132,7 +138,7 @@ impl super::MediaController for MacOSMediaController {
                 if let Some(duration) = metadata.duration {
                     let duration_key =
                         NSString::alloc(nil).init_str("MPMediaItemPropertyPlaybackDuration");
-                    let duration_value = NSNumber::alloc(nil).init_f64(duration);
+                    let duration_value = ns_number_from_f64(duration);
                     info.push((duration_key, duration_value));
                 }
 
@@ -193,14 +199,14 @@ impl super::MediaController for MacOSMediaController {
                     // Position
                     let position_key = NSString::alloc(nil)
                         .init_str("MPNowPlayingInfoPropertyElapsedPlaybackTime");
-                    let position_value = NSNumber::alloc(nil).init_f64(info.position);
+                    let position_value = ns_number_from_f64(info.position);
                     let _: () = msg_send![mut_dict, setObject:position_value forKey:position_key];
 
                     // Playback rate
                     let rate_key =
                         NSString::alloc(nil).init_str("MPNowPlayingInfoPropertyPlaybackRate");
                     let rate_value =
-                        NSNumber::alloc(nil).init_f64(if info.status == PlaybackStatus::Playing {
+                        ns_number_from_f64(if info.status == PlaybackStatus::Playing {
                             info.playback_rate
                         } else {
                             0.0
@@ -237,7 +243,7 @@ impl super::MediaController for MacOSMediaController {
                     } else {
                         0.0
                     };
-                    let rate_value = NSNumber::alloc(nil).init_f64(rate);
+                    let rate_value = ns_number_from_f64(rate);
                     let _: () = msg_send![mut_dict, setObject:rate_value forKey:rate_key];
 
                     let _: () = msg_send![info_center, setNowPlayingInfo: mut_dict];
@@ -271,7 +277,7 @@ impl super::MediaController for MacOSMediaController {
 
                     let position_key = NSString::alloc(nil)
                         .init_str("MPNowPlayingInfoPropertyElapsedPlaybackTime");
-                    let position_value = NSNumber::alloc(nil).init_f64(position);
+                    let position_value = ns_number_from_f64(position);
                     let _: () = msg_send![mut_dict, setObject:position_value forKey:position_key];
 
                     let _: () = msg_send![info_center, setNowPlayingInfo: mut_dict];
@@ -416,7 +422,7 @@ impl super::MediaController for MacOSMediaController {
     }
 
     fn is_enabled(&self) -> Result<bool, Box<dyn StdError>> {
-        // On macOS, media controls are always available once initialized
-        Ok(self.initialized)
+        // On macOS, media controls are always available
+        Ok(true)
     }
 }
