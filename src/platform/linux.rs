@@ -6,7 +6,7 @@ use dbus::channel::Sender;
 #[cfg(target_os = "linux")]
 use dbus::blocking::Connection;
 #[cfg(target_os = "linux")]
-use dbus_crossroads::{Crossroads, IfaceBuilder, IfaceToken};
+use dbus_crossroads::{Crossroads, IfaceBuilder};
 #[cfg(target_os = "linux")]
 use std::collections::HashMap;
 
@@ -283,7 +283,7 @@ impl LinuxMediaController {
                 // For raw image data, we need to save it temporarily and provide a file:// URL
                 // This is a simplified approach - in production you might want to use a proper temp file
                 use std::fs;
-                use std::path::PathBuf;
+                // use std::path::PathBuf;
 
                 let temp_dir = std::env::temp_dir();
                 let artwork_path = temp_dir.join(format!("mpris_artwork_{}.jpg", self.app_id));
