@@ -55,10 +55,8 @@ impl LinuxMediaController {
                 move |_, _| Ok(app_name.clone())
             });
             b.property("SupportedUriSchemes")
-                // .get(|_, _| Ok(vec!["file", "http", "https"]));
                 .get(|_, _| Ok(vec!["file".to_string(), "http".to_string(), "https".to_string()]));
             b.property("SupportedMimeTypes")
-                // .get(|_, _| Ok(vec!["audio/mpeg", "audio/mp4", "audio/ogg"]));
                 .get(|_, _| Ok(vec!["audio/mpeg".to_string(), "audio/mp4".to_string(), "audio/ogg".to_string()]));
         });
 
@@ -174,15 +172,12 @@ impl LinuxMediaController {
 
                 b.property("Metadata").get({
                     let metadata = self.create_metadata_dict();
-                    // move |_, _| Ok(metadata.clone())
-                    // move |_, _| Ok(std::collections::HashMap::new())
                     move |_, _| Ok(std::collections::HashMap::<String, dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>>::new())
                 });
 
                 b.property("Volume")
                     .get(|_, _| Ok(1.0_f64))
                     .set(|_, _, value: f64| {
-                        // Handle volume change
                         Ok(Some(value))
                     });
 
