@@ -437,12 +437,6 @@ impl super::MediaController for LinuxMediaController {
     }
 
 
-    // fn set_playback_info(&mut self, info: PlaybackInfo) -> Result<(), Box<dyn StdError>> {
-    //     self.playback_info = Some(info);
-
-    //     #[cfg(target_os = "linux")]
-    //     {
-    //         if let Some(conn) = &self.connection {
     fn set_playback_info(&mut self, info: PlaybackInfo) -> Result<(), Box<dyn StdError>> {
         self.playback_info = Some(info);
         // ADD THIS LINE: Get a reference to the data we just stored
@@ -559,97 +553,6 @@ impl super::MediaController for LinuxMediaController {
         // Fallback: Return our own metadata if no external player gave us data
         Ok(self.metadata.clone())
     }
-
-    // fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
-    //     // Linux'ta DBus üzerinden diğer media player'lardan bilgi almak için
-    //     // org.mpris.MediaPlayer2.* servislerini sorgulamamız gerekiyor
-    //     #[cfg(target_os = "linux")]
-    //     {
-    //         if let Some(conn) = &self.connection {
-    //             // List all MPRIS players
-    //             let proxy = conn.with_proxy(
-    //                 "org.freedesktop.DBus",
-    //                 "/",
-    //                 std::time::Duration::from_millis(500),
-    //             );
-    //             use dbus::blocking::stdintf::org_freedesktop_dbus::Peer;
-
-    //             if let Ok(names) = proxy.list_names() {
-    //                 for name in names {
-    //                     if name.starts_with("org.mpris.MediaPlayer2.")
-    //                         && !name.contains(&self.app_id)
-    //                     {
-    //                         // Found another media player, try to get its metadata
-    //                         let player_proxy = conn.with_proxy(
-    //                             &name,
-    //                             "/org/mpris/MediaPlayer2",
-    //                             std::time::Duration::from_millis(500),
-    //                         );
-
-    //                         use dbus::blocking::stdintf::org_freedesktop_dbus::Properties;
-    //                         if let Ok(metadata_variant) =
-    //                             player_proxy.get("org.mpris.MediaPlayer2.Player", "Metadata")
-    //                         {
-    //                             if let Ok(metadata) = metadata_variant.0.as_iter() {
-    //                                 let mut title = None;
-    //                                 let mut artist = None;
-    //                                 let mut album = None;
-    //                                 let mut artwork_url = None;
-
-    //                                 for (key, value) in metadata {
-    //                                     if let Some(key_str) = key.as_str() {
-    //                                         match key_str {
-    //                                             "xesam:title" => {
-    //                                                 if let Some(v) = value.as_str() {
-    //                                                     title = Some(v.to_string());
-    //                                                 }
-    //                                             }
-    //                                             "xesam:artist" => {
-    //                                                 if let Some(arr) = value.as_iter() {
-    //                                                     if let Some(first) = arr.next() {
-    //                                                         if let Some(v) = first.1.as_str() {
-    //                                                             artist = Some(v.to_string());
-    //                                                         }
-    //                                                     }
-    //                                                 }
-    //                                             }
-    //                                             "xesam:album" => {
-    //                                                 if let Some(v) = value.as_str() {
-    //                                                     album = Some(v.to_string());
-    //                                                 }
-    //                                             }
-    //                                             "mpris:artUrl" => {
-    //                                                 if let Some(v) = value.as_str() {
-    //                                                     artwork_url = Some(v.to_string());
-    //                                                 }
-    //                                             }
-    //                                             _ => {}
-    //                                         }
-    //                                     }
-    //                                 }
-
-    //                                 if title.is_some() || artist.is_some() {
-    //                                     return Ok(Some(MediaMetadata {
-    //                                         title: title.unwrap_or_else(|| "Unknown".to_string()),
-    //                                         artist,
-    //                                         album,
-    //                                         album_artist: None,
-    //                                         artwork_url,
-    //                                         artwork_data: None, // MPRIS doesn't provide raw data
-    //                                         duration: None,
-    //                                     }));
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     // Fall back to our own metadata
-    //     Ok(self.metadata.clone())
-    // }
 
     fn get_playback_info(&self) -> Result<Option<PlaybackInfo>, Box<dyn StdError>> {
         Ok(self.playback_info.clone())
