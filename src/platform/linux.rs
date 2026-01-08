@@ -1,11 +1,12 @@
 use crate::models::*;
 use std::error::Error as StdError;
 use std::sync::{Arc, Mutex};
+use dbus::channel::Sender;
 
 #[cfg(target_os = "linux")]
 use dbus::blocking::Connection;
 #[cfg(target_os = "linux")]
-use dbus_crossroads::{Crossroads, IfaceBuilder, IfaceToken};
+use dbus_crossroads::{Crossroads, IfaceBuilder};
 #[cfg(target_os = "linux")]
 use std::collections::HashMap;
 
@@ -54,9 +55,9 @@ impl LinuxMediaController {
                 move |_, _| Ok(app_name.clone())
             });
             b.property("SupportedUriSchemes")
-                .get(|_, _| Ok(vec!["file", "http", "https"]));
+                .get(|_, _| Ok(vec!["file".to_string(), "http".to_string(), "https".to_string()]));
             b.property("SupportedMimeTypes")
-                .get(|_, _| Ok(vec!["audio/mpeg", "audio/mp4", "audio/ogg"]));
+                .get(|_, _| Ok(vec!["audio/mpeg".to_string(), "audio/mp4".to_string(), "audio/ogg".to_string()]));
         });
 
         // MediaPlayer2.Player interface
@@ -171,13 +172,12 @@ impl LinuxMediaController {
 
                 b.property("Metadata").get({
                     let metadata = self.create_metadata_dict();
-                    move |_, _| Ok(metadata.clone())
+                    move |_, _| Ok(std::collections::HashMap::<String, dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>>::new())
                 });
 
                 b.property("Volume")
                     .get(|_, _| Ok(1.0_f64))
                     .set(|_, _, value: f64| {
-                        // Handle volume change
                         Ok(Some(value))
                     });
 
@@ -278,7 +278,6 @@ impl LinuxMediaController {
                 // For raw image data, we need to save it temporarily and provide a file:// URL
                 // This is a simplified approach - in production you might want to use a proper temp file
                 use std::fs;
-                use std::path::PathBuf;
 
                 let temp_dir = std::env::temp_dir();
                 let artwork_path = temp_dir.join(format!("mpris_artwork_{}.jpg", self.app_id));
@@ -295,6 +294,95 @@ impl LinuxMediaController {
         }
 
         metadata
+    }
+
+    #[cfg(target_os = "linux")]
+    fn get_other_player_names(&self, conn: &Connection) -> Vec<String> {
+        let proxy = conn.with_proxy(
+            "org.freedesktop.DBus",
+            "/",
+            std::time::Duration::from_millis(500),
+        );
+
+        // FIX: We use method_call directly to avoid importing the private DBus trait
+        let result: Result<(Vec<String>,), _> =
+            proxy.method_call("org.freedesktop.DBus", "ListNames", ());
+
+        match result {
+            Ok((names,)) => names
+                .into_iter()
+                .filter(|name| {
+                    name.starts_with("org.mpris.MediaPlayer2.") && !name.contains(&self.app_id)
+                })
+                .collect(),
+            Err(_) => Vec::new(),
+        }
+    }
+
+    #[cfg(target_os = "linux")]
+    fn fetch_external_metadata(conn: &Connection, service_name: &str) -> Option<MediaMetadata> {
+        use dbus::blocking::stdintf::org_freedesktop_dbus::Properties;
+        
+        let proxy = conn.with_proxy(
+            service_name,
+            "/org/mpris/MediaPlayer2",
+            std::time::Duration::from_millis(500),
+        );
+
+        // 1. Get the raw Metadata variant
+        let metadata_variant: dbus::arg::Variant<Box<dyn dbus::arg::RefArg>> = proxy
+            .get("org.mpris.MediaPlayer2.Player", "Metadata")
+            .ok()?;
+
+        // 2. Get the iterator for the Dictionary
+        let entries = metadata_variant.0.as_iter()?;
+
+        let mut title = String::from("Unknown");
+        let mut artist = None;
+        let mut album = None;
+        let mut artwork_url = None;
+
+        // 3. Manually unpack every entry (Map<String, Variant>)
+        for entry in entries {
+            // Each 'entry' is a Dictionary Entry. We must iterate INTO it to get Key and Value.
+            if let Some(mut dict_iter) = entry.as_iter() {
+                let key_ref = dict_iter.next()?;
+                let value_ref = dict_iter.next()?;
+
+                if let Some(key) = key_ref.as_str() {
+                    match key {
+                        "xesam:title" => {
+                            if let Some(s) = value_ref.as_str() { title = s.to_string(); }
+                        }
+                        "xesam:artist" => {
+                            // Artist is a List of Strings, so we iterate again
+                            if let Some(iter) = value_ref.as_iter() {
+                                if let Some(first) = iter.flat_map(|x| x.as_str()).next() {
+                                    artist = Some(first.to_string());
+                                }
+                            }
+                        }
+                        "xesam:album" => {
+                            if let Some(s) = value_ref.as_str() { album = Some(s.to_string()); }
+                        }
+                        "mpris:artUrl" => {
+                            if let Some(s) = value_ref.as_str() { artwork_url = Some(s.to_string()); }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+
+        Some(MediaMetadata {
+            title,
+            artist,
+            album,
+            album_artist: None,
+            artwork_url,
+            artwork_data: None,
+            duration: None,
+        })
     }
 }
 
@@ -344,10 +432,10 @@ impl super::MediaController for LinuxMediaController {
 
     fn set_playback_info(&mut self, info: PlaybackInfo) -> Result<(), Box<dyn StdError>> {
         self.playback_info = Some(info);
+        let info = self.playback_info.as_ref().unwrap();
 
         #[cfg(target_os = "linux")]
         {
-            // Send PropertiesChanged signal for playback status
             if let Some(conn) = &self.connection {
                 let status = match info.status {
                     PlaybackStatus::Playing => "Playing",
@@ -355,21 +443,24 @@ impl super::MediaController for LinuxMediaController {
                     PlaybackStatus::Stopped => "Stopped",
                 };
 
-                let mut changed = HashMap::new();
-                changed.insert("PlaybackStatus", dbus::arg::Variant(status));
+                // FIX: Explicitly define the map type to accept mixed values via RefArg
+                let mut changed: HashMap<String, dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>> = HashMap::new();
+                
+                // FIX: Box every value
+                changed.insert("PlaybackStatus".to_string(), dbus::arg::Variant(Box::new(status.to_string())));
                 changed.insert(
-                    "Position",
-                    dbus::arg::Variant((info.position * 1_000_000.0) as i64),
+                    "Position".to_string(),
+                    dbus::arg::Variant(Box::new((info.position * 1_000_000.0) as i64)),
                 );
-                changed.insert("Rate", dbus::arg::Variant(info.playback_rate));
-                changed.insert("Shuffle", dbus::arg::Variant(info.shuffle));
+                changed.insert("Rate".to_string(), dbus::arg::Variant(Box::new(info.playback_rate)));
+                changed.insert("Shuffle".to_string(), dbus::arg::Variant(Box::new(info.shuffle)));
 
                 let loop_status = match info.repeat_mode {
                     RepeatMode::None => "None",
                     RepeatMode::Track => "Track",
                     RepeatMode::List => "Playlist",
                 };
-                changed.insert("LoopStatus", dbus::arg::Variant(loop_status));
+                changed.insert("LoopStatus".to_string(), dbus::arg::Variant(Box::new(loop_status.to_string())));
 
                 let msg = dbus::Message::signal(
                     &dbus::Path::from("/org/mpris/MediaPlayer2"),
@@ -416,7 +507,7 @@ impl super::MediaController for LinuxMediaController {
                 )
                 .append1("org.mpris.MediaPlayer2.Player")
                 .append2(
-                    vec![("Metadata", HashMap::new())]
+                    vec![("Metadata", std::collections::HashMap::<String, dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>>::new())]
                         .into_iter()
                         .collect::<HashMap<_, _>>(),
                     Vec::<String>::new(),
@@ -435,93 +526,19 @@ impl super::MediaController for LinuxMediaController {
     }
 
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
-        // Linux'ta DBus üzerinden diğer media player'lardan bilgi almak için
-        // org.mpris.MediaPlayer2.* servislerini sorgulamamız gerekiyor
         #[cfg(target_os = "linux")]
         {
             if let Some(conn) = &self.connection {
-                // List all MPRIS players
-                let proxy = conn.with_proxy(
-                    "org.freedesktop.DBus",
-                    "/",
-                    std::time::Duration::from_millis(500),
-                );
-                use dbus::blocking::stdintf::org_freedesktop_dbus::Peer;
-
-                if let Ok(names) = proxy.list_names() {
-                    for name in names {
-                        if name.starts_with("org.mpris.MediaPlayer2.")
-                            && !name.contains(&self.app_id)
-                        {
-                            // Found another media player, try to get its metadata
-                            let player_proxy = conn.with_proxy(
-                                &name,
-                                "/org/mpris/MediaPlayer2",
-                                std::time::Duration::from_millis(500),
-                            );
-
-                            use dbus::blocking::stdintf::org_freedesktop_dbus::Properties;
-                            if let Ok(metadata_variant) =
-                                player_proxy.get("org.mpris.MediaPlayer2.Player", "Metadata")
-                            {
-                                if let Ok(metadata) = metadata_variant.0.as_iter() {
-                                    let mut title = None;
-                                    let mut artist = None;
-                                    let mut album = None;
-                                    let mut artwork_url = None;
-
-                                    for (key, value) in metadata {
-                                        if let Some(key_str) = key.as_str() {
-                                            match key_str {
-                                                "xesam:title" => {
-                                                    if let Some(v) = value.as_str() {
-                                                        title = Some(v.to_string());
-                                                    }
-                                                }
-                                                "xesam:artist" => {
-                                                    if let Some(arr) = value.as_iter() {
-                                                        if let Some(first) = arr.next() {
-                                                            if let Some(v) = first.1.as_str() {
-                                                                artist = Some(v.to_string());
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                "xesam:album" => {
-                                                    if let Some(v) = value.as_str() {
-                                                        album = Some(v.to_string());
-                                                    }
-                                                }
-                                                "mpris:artUrl" => {
-                                                    if let Some(v) = value.as_str() {
-                                                        artwork_url = Some(v.to_string());
-                                                    }
-                                                }
-                                                _ => {}
-                                            }
-                                        }
-                                    }
-
-                                    if title.is_some() || artist.is_some() {
-                                        return Ok(Some(MediaMetadata {
-                                            title: title.unwrap_or_else(|| "Unknown".to_string()),
-                                            artist,
-                                            album,
-                                            album_artist: None,
-                                            artwork_url,
-                                            artwork_data: None, // MPRIS doesn't provide raw data
-                                            duration: None,
-                                        }));
-                                    }
-                                }
-                            }
-                        }
+                let players = self.get_other_player_names(conn);
+                for player in players {
+                    if let Some(meta) = Self::fetch_external_metadata(conn, &player) {
+                        return Ok(Some(meta));
                     }
                 }
             }
         }
 
-        // Fall back to our own metadata
+        // Fallback: Return our own metadata if no external player gave us data
         Ok(self.metadata.clone())
     }
 
