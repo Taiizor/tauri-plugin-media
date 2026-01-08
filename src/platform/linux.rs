@@ -439,7 +439,6 @@ impl super::MediaController for LinuxMediaController {
 
     fn set_playback_info(&mut self, info: PlaybackInfo) -> Result<(), Box<dyn StdError>> {
         self.playback_info = Some(info);
-        // ADD THIS LINE: Get a reference to the data we just stored
         let info = self.playback_info.as_ref().unwrap();
 
         #[cfg(target_os = "linux")]
@@ -515,7 +514,6 @@ impl super::MediaController for LinuxMediaController {
                 )
                 .append1("org.mpris.MediaPlayer2.Player")
                 .append2(
-                    // vec![("Metadata", HashMap::new())]
                     vec![("Metadata", std::collections::HashMap::<String, dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>>::new())]
                         .into_iter()
                         .collect::<HashMap<_, _>>(),
@@ -538,10 +536,7 @@ impl super::MediaController for LinuxMediaController {
         #[cfg(target_os = "linux")]
         {
             if let Some(conn) = &self.connection {
-                // 1. Get list of other players
                 let players = self.get_other_player_names(conn);
-
-                // 2. Find the first one that returns valid metadata
                 for player in players {
                     if let Some(meta) = Self::fetch_external_metadata(conn, &player) {
                         return Ok(Some(meta));
