@@ -278,7 +278,6 @@ impl LinuxMediaController {
                 // For raw image data, we need to save it temporarily and provide a file:// URL
                 // This is a simplified approach - in production you might want to use a proper temp file
                 use std::fs;
-                // use std::path::PathBuf;
 
                 let temp_dir = std::env::temp_dir();
                 let artwork_path = temp_dir.join(format!("mpris_artwork_{}.jpg", self.app_id));
@@ -430,7 +429,6 @@ impl super::MediaController for LinuxMediaController {
 
         Ok(())
     }
-
 
     fn set_playback_info(&mut self, info: PlaybackInfo) -> Result<(), Box<dyn StdError>> {
         self.playback_info = Some(info);
