@@ -47,6 +47,7 @@ jobs:
       - name: install dependencies
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
+          echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
           echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
           sudo sed -i -e 's/azure\.//' /etc/apt/apt-mirrors.txt 2>/dev/null || true
           sudo mkdir -p /etc/needrestart/conf.d
