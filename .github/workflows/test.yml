@@ -39,7 +39,7 @@ jobs:
           sudo mkdir -p /etc/needrestart/conf.d
           echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/conf.d/99no-prompt.conf
           sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y --no-install-recommends libdbus-1-dev
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y --no-install-recommends libdbus-1-dev libwebkit2gtk-4.1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         env:
