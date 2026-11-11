@@ -27,8 +27,9 @@ jobs:
       - name: install webkit2gtk
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y webkit2gtk-4.1
+          sudo apt-get remove -y needrestart 2>/dev/null || true
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y webkit2gtk-4.1
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         env:
