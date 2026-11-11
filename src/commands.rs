@@ -74,13 +74,13 @@ pub(crate) async fn is_enabled<R: Runtime>(app: AppHandle<R>) -> Result<bool> {
 }
 
 #[command]
-pub(crate) async fn next<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+pub(crate) async fn next<R: Runtime>(_app: AppHandle<R>) -> Result<()> {
     // Trigger next track event - implementation depends on event handler
     Ok(())
 }
 
 #[command]
-pub(crate) async fn previous<R: Runtime>(app: AppHandle<R>) -> Result<()> {
+pub(crate) async fn previous<R: Runtime>(_app: AppHandle<R>) -> Result<()> {
     // Trigger previous track event - implementation depends on event handler
     Ok(())
 }

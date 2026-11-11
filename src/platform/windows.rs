@@ -20,11 +20,13 @@ use windows::{
     Storage::Streams::RandomAccessStreamReference,
 };
 
+type WindowsEventHandler = Option<Arc<Mutex<Box<dyn Fn(MediaControlEvent) + Send>>>>;
+
 pub struct WindowsMediaController {
     #[cfg(target_os = "windows")]
     media_player: Option<MediaPlayer>,
     controls: Option<SystemMediaTransportControls>,
-    event_handler: Option<Arc<Mutex<Box<dyn Fn(MediaControlEvent) + Send>>>>,
+    event_handler: WindowsEventHandler,
     metadata: Option<MediaMetadata>,
     playback_info: Option<PlaybackInfo>,
 }
@@ -469,7 +471,7 @@ impl super::MediaController for WindowsMediaController {
                     return Ok(Some(PlaybackInfo {
                         status,
                         shuffle: is_shuffle,
-                        repeat_mode: repeat_mode,
+                        repeat_mode,
                         playback_rate,
                         position: 0.0, // Will be set by get_position
                     }));
