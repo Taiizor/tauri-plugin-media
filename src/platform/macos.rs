@@ -10,7 +10,7 @@ use cocoa::base::{id, nil};
 #[cfg(target_os = "macos")]
 use cocoa::foundation::{NSArray, NSDictionary, NSString};
 #[cfg(target_os = "macos")]
-use objc::{class, msg_send, runtime::Object, sel, sel_impl};
+use objc::{class, msg_send, sel, sel_impl};
 
 // Helper to create NSNumber since it was removed from cocoa::foundation in 0.26+
 #[cfg(target_os = "macos")]
