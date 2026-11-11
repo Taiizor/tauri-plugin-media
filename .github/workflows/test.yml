@@ -28,9 +28,10 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+          echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
           sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' /etc/apt/apt-mirrors.txt /etc/apt/sources.list /etc/apt/sources.list.d/*.sources 2>/dev/null || true
-          sudo apt-get update
-          sudo apt-get install -y libdbus-1-dev
+          sudo apt-get -o Acquire::ForceIPv4=true update
+          sudo apt-get -o Acquire::ForceIPv4=true install -y libdbus-1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         env:
