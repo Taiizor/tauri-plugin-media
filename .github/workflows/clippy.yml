@@ -44,11 +44,11 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - name: install webkit2gtk
+      - name: install dependencies
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.1
+          sudo apt-get update -o Acquire::Retries=3 -o Acquire::http::Timeout="30"
+          sudo apt-get install -y --no-install-recommends libwebkit2gtk-4.1-dev libdbus-1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run clippy
         env:
