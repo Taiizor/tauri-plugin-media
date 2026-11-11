@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
 // Media metadata interface
 export interface MediaMetadata {
@@ -51,9 +52,28 @@ export enum MediaControlEventType {
 
 // Media control event interface
 export interface MediaControlEvent {
-  eventType: MediaControlEventType;
+  eventType: MediaControlEventType | { [key: string]: any };
   timestamp: number;
   data?: any;
+}
+
+export type MediaEventHandler = (event: MediaControlEvent) => void;
+
+// Skip to next track
+export async function next(): Promise<void> {
+  await invoke('plugin:media|next');
+}
+
+// Skip to previous track
+export async function previous(): Promise<void> {
+  await invoke('plugin:media|previous');
+}
+
+// Listen for media control events from the backend (hardware buttons, OS controls, etc.)
+export async function onMediaEvent(handler: MediaEventHandler): Promise<UnlistenFn> {
+  return await listen<MediaControlEvent>('media-control-event', (event) => {
+    handler(event.payload);
+  });
 }
 
 // Initialize the media session
@@ -127,6 +147,7 @@ export async function isEnabled(): Promise<boolean> {
 // Media controls class for easier usage
 export class MediaControls {
   private initialized = false;
+  private eventUnlisten: UnlistenFn | null = null;
 
   async initialize(appId: string, appName: string): Promise<void> {
     if (this.initialized) return;
@@ -172,11 +193,11 @@ export class MediaControls {
   }
 
   async next(): Promise<void> {
-    await invoke('plugin:media|next');
+    await next();
   }
 
   async previous(): Promise<void> {
-    await invoke('plugin:media|previous');
+    await previous();
   }
 
   async setPosition(position: number): Promise<void> {
@@ -215,9 +236,18 @@ export class MediaControls {
     return await invoke('plugin:media|is_enabled');
   }
 
-  setEventHandler(handler: ((event: MediaControlEvent) => void) | null): void {
-    // This would need actual event listener implementation
-    console.warn('Event handler not yet implemented');
+  async setEventHandler(handler: MediaEventHandler | null): Promise<void> {
+    if (this.eventUnlisten) {
+      this.eventUnlisten();
+      this.eventUnlisten = null;
+    }
+    if (handler) {
+      this.eventUnlisten = await onMediaEvent(handler);
+    }
+  }
+
+  async onEvent(handler: MediaEventHandler): Promise<UnlistenFn> {
+    return await onMediaEvent(handler);
   }
 
   async clear(): Promise<void> {

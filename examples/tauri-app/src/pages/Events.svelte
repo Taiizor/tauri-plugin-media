@@ -39,9 +39,11 @@
     try {
       // Listen for media control events from the Rust backend
       unlistenFn = await listen('media-control-event', (event) => {
+        const rawType = event.payload?.eventType || event.payload?.type;
+        const eventType = typeof rawType === 'object' && rawType !== null ? Object.keys(rawType)[0] : rawType;
         const eventEntry = {
           id: Date.now(),
-          type: event.payload?.type || 'unknown',
+          type: eventType || 'unknown',
           timestamp: new Date(),
           data: event.payload,
           isReal: true

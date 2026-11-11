@@ -15,6 +15,8 @@ Default permissions for the plugin
 - `allow-get-playback-status`
 - `allow-get-position`
 - `allow-is-enabled`
+- `allow-next`
+- `allow-previous`
 
 ## Permission Table
 
@@ -203,6 +205,58 @@ Enables the is_enabled command without any pre-configured scope.
 <td>
 
 Denies the is_enabled command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`media:allow-next`
+
+</td>
+<td>
+
+Enables the next command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`media:deny-next`
+
+</td>
+<td>
+
+Denies the next command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`media:allow-previous`
+
+</td>
+<td>
+
+Enables the previous command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`media:deny-previous`
+
+</td>
+<td>
+
+Denies the previous command without any pre-configured scope.
 
 </td>
 </tr>

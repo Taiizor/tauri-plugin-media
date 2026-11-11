@@ -160,5 +160,26 @@ mod tests {
         let json = serde_json::to_string(&event).unwrap();
         assert!(json.contains("\"eventType\":\"play\""));
         assert!(json.contains("\"timestamp\":1700000000"));
+
+        let next_event = MediaControlEvent {
+            event_type: MediaControlEventType::Next,
+            timestamp: 1700000001,
+        };
+        let next_json = serde_json::to_string(&next_event).unwrap();
+        assert!(next_json.contains("\"eventType\":\"next\""));
+
+        let prev_event = MediaControlEvent {
+            event_type: MediaControlEventType::Previous,
+            timestamp: 1700000002,
+        };
+        let prev_json = serde_json::to_string(&prev_event).unwrap();
+        assert!(prev_json.contains("\"eventType\":\"previous\""));
+
+        let seek_event = MediaControlEvent {
+            event_type: MediaControlEventType::SeekTo(42.5),
+            timestamp: 1700000003,
+        };
+        let seek_json = serde_json::to_string(&seek_event).unwrap();
+        assert!(seek_json.contains("\"seekTo\":42.5"));
     }
 }

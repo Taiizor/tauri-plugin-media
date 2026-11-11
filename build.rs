@@ -10,6 +10,8 @@ const COMMANDS: &[&str] = &[
     "get_playback_status",
     "get_position",
     "is_enabled",
+    "next",
+    "previous",
 ];
 
 fn main() {
