@@ -542,3 +542,47 @@ impl super::MediaController for WindowsMediaController {
         Ok(false)
     }
 }
+
+#[cfg(all(test, target_os = "windows"))]
+mod tests {
+    use super::*;
+    use crate::platform::MediaController;
+
+    #[test]
+    fn test_windows_media_controller() {
+        let mut controller = WindowsMediaController::new();
+        let init_res = controller.initialize_session("com.test.media".into(), "Test Media".into());
+        println!("initialize_session result: {:?}", init_res);
+        assert!(init_res.is_ok());
+
+        let metadata = MediaMetadata {
+            title: "Test Windows Track".to_string(),
+            artist: Some("Test Artist".to_string()),
+            album: Some("Test Album".to_string()),
+            album_artist: None,
+            duration: Some(210.0),
+            artwork_url: None,
+            artwork_data: None,
+        };
+
+        let meta_res = controller.set_metadata(metadata);
+        println!("set_metadata result: {:?}", meta_res);
+        assert!(meta_res.is_ok());
+
+        let get_meta = controller.get_metadata().unwrap();
+        println!("get_metadata result: {:?}", get_meta);
+        assert!(get_meta.is_some());
+
+        let status_res = controller.set_playback_status(PlaybackStatus::Playing);
+        println!("set_playback_status result: {:?}", status_res);
+        assert!(status_res.is_ok());
+
+        let read_status = controller.get_playback_status().unwrap();
+        println!("read_status: {:?}", read_status);
+        assert_eq!(read_status, PlaybackStatus::Playing);
+
+        let clear_res = controller.clear_metadata();
+        println!("clear_metadata result: {:?}", clear_res);
+        assert!(clear_res.is_ok());
+    }
+}
