@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::models::*;
 use std::error::Error as StdError;
 use std::ffi::CStr;
@@ -156,7 +158,7 @@ impl super::MediaController for MacOSMediaController {
                     let temp_dir = std::env::temp_dir();
                     let artwork_path = temp_dir.join("macos_artwork.jpg");
 
-                    if let Ok(_) = fs::write(&artwork_path, artwork_data) {
+                    if fs::write(&artwork_path, artwork_data).is_ok() {
                         let file_url = format!("file://{}", artwork_path.display());
                         let artwork_key =
                             NSString::alloc(nil).init_str("MPMediaItemPropertyArtworkURL");

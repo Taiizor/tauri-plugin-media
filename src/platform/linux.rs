@@ -490,7 +490,10 @@ impl super::MediaController for LinuxMediaController {
                 drop(guard);
 
                 let mut changed = HashMap::new();
-                changed.insert("Metadata", dbus::arg::Variant(dict));
+                changed.insert(
+                    "Metadata".to_string(),
+                    dbus::arg::Variant(Box::new(dict) as Box<dyn dbus::arg::RefArg>),
+                );
 
                 let msg = dbus::Message::signal(
                     &dbus::Path::from("/org/mpris/MediaPlayer2"),
@@ -521,20 +524,35 @@ impl super::MediaController for LinuxMediaController {
                 };
 
                 let mut changed = HashMap::new();
-                changed.insert("PlaybackStatus", dbus::arg::Variant(status));
                 changed.insert(
-                    "Position",
-                    dbus::arg::Variant((info.position * 1_000_000.0) as i64),
+                    "PlaybackStatus".to_string(),
+                    dbus::arg::Variant(Box::new(status.to_string()) as Box<dyn dbus::arg::RefArg>),
                 );
-                changed.insert("Rate", dbus::arg::Variant(info.playback_rate));
-                changed.insert("Shuffle", dbus::arg::Variant(info.shuffle));
+                changed.insert(
+                    "Position".to_string(),
+                    dbus::arg::Variant(Box::new((info.position * 1_000_000.0) as i64)
+                        as Box<dyn dbus::arg::RefArg>),
+                );
+                changed.insert(
+                    "Rate".to_string(),
+                    dbus::arg::Variant(Box::new(info.playback_rate) as Box<dyn dbus::arg::RefArg>),
+                );
+                changed.insert(
+                    "Shuffle".to_string(),
+                    dbus::arg::Variant(Box::new(info.shuffle) as Box<dyn dbus::arg::RefArg>),
+                );
 
                 let loop_status = match info.repeat_mode {
                     RepeatMode::None => "None",
                     RepeatMode::Track => "Track",
                     RepeatMode::List => "Playlist",
                 };
-                changed.insert("LoopStatus", dbus::arg::Variant(loop_status));
+                changed.insert(
+                    "LoopStatus".to_string(),
+                    dbus::arg::Variant(
+                        Box::new(loop_status.to_string()) as Box<dyn dbus::arg::RefArg>
+                    ),
+                );
 
                 let msg = dbus::Message::signal(
                     &dbus::Path::from("/org/mpris/MediaPlayer2"),
@@ -578,11 +596,11 @@ impl super::MediaController for LinuxMediaController {
             if let Some(conn) = &self.connection {
                 let mut changed = HashMap::new();
                 changed.insert(
-                    "Metadata",
-                    dbus::arg::Variant(HashMap::<
+                    "Metadata".to_string(),
+                    dbus::arg::Variant(Box::new(HashMap::<
                         String,
                         dbus::arg::Variant<Box<dyn dbus::arg::RefArg>>,
-                    >::new()),
+                    >::new()) as Box<dyn dbus::arg::RefArg>),
                 );
 
                 let msg = dbus::Message::signal(
