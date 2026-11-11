@@ -28,6 +28,9 @@ An advanced system media control integration plugin for Tauri applications. This
 The easiest way to install this plugin is using the Tauri CLI, which automatically adds both Rust and JavaScript dependencies to your project:
 
 ```bash
+# Using bun (Recommended)
+bun tauri add media
+
 # Using npm
 npm run tauri add media
 
@@ -69,10 +72,16 @@ tauri-plugin-media = "0.1.2"
 Add the plugin API package to your project:
 
 ```bash
+# Using bun (Recommended)
+bun add tauri-plugin-media-api
+
+# Using pnpm
 pnpm install tauri-plugin-media-api
-# or
+
+# Using npm
 npm install tauri-plugin-media-api
-# or
+
+# Using yarn
 yarn add tauri-plugin-media-api
 ```
 
@@ -438,14 +447,17 @@ The example application includes:
 # Navigate to the example directory
 cd examples/tauri-app
 
-# Install dependencies
-npm install
+# Install dependencies (bun recommended)
+bun install
+# or npm install / pnpm install
 
 # Run in development mode
-npm run tauri dev
+bun run tauri dev
+# or npm run tauri dev
 
 # Build for production
-npm run tauri build
+bun run tauri build
+# or npm run tauri build
 ```
 
 ## Development Status
@@ -466,7 +478,7 @@ npm run tauri build
 
 - **Tauri**: v2.0 or later
 - **Rust**: 1.77.2 or later
-- **Node.js**: 16.0 or later
+- **Bun / Node.js**: Bun 1.0+ (recommended) or Node.js 18+
 
 ### Platform-Specific Requirements
 
