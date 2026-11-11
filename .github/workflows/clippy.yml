@@ -47,9 +47,10 @@ jobs:
       - name: install webkit2gtk
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          sudo apt-get remove -y needrestart 2>/dev/null || true
-          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y webkit2gtk-4.1
+          sudo mkdir -p /etc/needrestart/conf.d
+          echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/conf.d/no-restart.conf
+          sudo apt-get update -y
+          sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" webkit2gtk-4.1
       - uses: Swatinem/rust-cache@v2
       - name: Run clippy
         env:
