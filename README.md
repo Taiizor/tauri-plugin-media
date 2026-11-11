@@ -61,7 +61,7 @@ Or manually add to your `Cargo.toml` file:
 ```toml
 [dependencies]
 tauri = { version = "2.8.2" }
-tauri-plugin-media = "0.1.1"
+tauri-plugin-media = "0.1.2"
 ```
 
 #### JavaScript/TypeScript API
@@ -256,6 +256,12 @@ if (isEnabled) {
   console.log('Media controls are available');
 }
 
+// Listen for OS and hardware media key events
+const unlisten = await mediaControls.onEvent((event) => {
+  console.log('Received media event:', event);
+  // event can be 'play', 'pause', 'toggle', 'next', 'previous', 'stop', or { seekTo: seconds }
+});
+
 // Clear all metadata
 await mediaControls.clearNowPlaying();
 ```
@@ -377,6 +383,11 @@ interface PlaybackInfo {
 - `getPosition(): Promise<number>` - Get current playback position
 - `isEnabled(): Promise<boolean>` - Check if media controls are available
 
+##### Event Handling
+
+- `onMediaEvent(handler: (event: MediaControlEvent) => void): Promise<UnlistenFn>` - Listen for OS and hardware media events
+- `mediaControls.onEvent(handler: (event: MediaControlEvent) => void): Promise<UnlistenFn>` - Listen for OS and hardware media events via class instance
+
 ## Platform Implementation
 
 ### Windows
@@ -448,7 +459,7 @@ npm run tauri build
 | TypeScript API | ✅ Complete | Full TypeScript bindings |
 | Example Application | ✅ Complete | Comprehensive demo app |
 | System Media Reading | ✅ Complete | Get media from other apps |
-| Event Callbacks | ⚠️ Partial | OS to app event handling |
+| Event Callbacks | ✅ Complete | OS to app event handling |
 | Advanced Features | ⏳ Planned | Playlists, queue management |
 
 ## Requirements

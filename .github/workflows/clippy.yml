@@ -47,7 +47,12 @@ jobs:
       - name: install webkit2gtk
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
-          sudo apt-get update
+          echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
+          sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' /etc/apt/sources.list 2>/dev/null || true
+          if [ -d /etc/apt/sources.list.d ]; then
+            sudo find /etc/apt/sources.list.d/ -type f -name "*.sources" -exec sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' {} + 2>/dev/null || true
+          fi
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get update
           sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y --no-install-recommends \
             -o Dpkg::Options::="--force-confdef" \
             -o Dpkg::Options::="--force-confold" \

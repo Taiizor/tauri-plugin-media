@@ -12,7 +12,7 @@ repository = "https://github.com/Taiizor/tauri-plugin-media"
 readme = "README.md"
 
 [dependencies]
-tauri = { version = "2.11.6" }
+tauri = { version = "2.11.6", default-features = false }
 serde = "1.0"
 thiserror = "2"
 serde_json = "1.0"
