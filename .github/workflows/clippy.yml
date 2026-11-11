@@ -49,8 +49,10 @@ jobs:
         run: |
           echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
           sudo sed -i -e 's/azure\.//' /etc/apt/apt-mirrors.txt 2>/dev/null || true
-          sudo apt-get -o Acquire::ForceIPv4=true update
-          sudo apt-get -o Acquire::ForceIPv4=true install -y libdbus-1-dev
+          sudo mkdir -p /etc/needrestart/conf.d
+          echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/conf.d/99no-prompt.conf
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get -o Acquire::ForceIPv4=true update
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get -o Acquire::ForceIPv4=true install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libdbus-1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run clippy
         env:
