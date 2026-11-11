@@ -28,7 +28,10 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libdbus-1-dev
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y --no-install-recommends \
+            -o Dpkg::Options::="--force-confdef" \
+            -o Dpkg::Options::="--force-confold" \
+            libwebkit2gtk-4.1-dev libdbus-1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         env:
