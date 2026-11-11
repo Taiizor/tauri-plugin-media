@@ -437,7 +437,9 @@ impl super::MediaController for WindowsMediaController {
                                     if let Ok(size) = stream.Size() {
                                         if size > 0 && size < 10_000_000 {
                                             // Limit to 10MB
-                                            if let Ok(reader) = DataReader::CreateDataReader(&stream) {
+                                            if let Ok(reader) =
+                                                DataReader::CreateDataReader(&stream)
+                                            {
                                                 if let Ok(load_op) = reader.LoadAsync(size as u32) {
                                                     if load_op.get().is_ok() {
                                                         let mut buffer = vec![0u8; size as usize];
