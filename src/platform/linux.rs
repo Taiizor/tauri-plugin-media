@@ -11,12 +11,14 @@ use dbus_crossroads::{Crossroads, IfaceBuilder};
 #[cfg(target_os = "linux")]
 use std::collections::HashMap;
 
+type LinuxEventHandler = Arc<Mutex<Option<Box<dyn Fn(MediaControlEvent) + Send>>>>;
+
 pub struct LinuxMediaController {
     #[cfg(target_os = "linux")]
     connection: Option<Connection>,
     #[cfg(target_os = "linux")]
     crossroads: Option<Arc<Mutex<Crossroads>>>,
-    event_handler: Arc<Mutex<Option<Box<dyn Fn(MediaControlEvent) + Send>>>>,
+    event_handler: LinuxEventHandler,
     metadata: Arc<Mutex<Option<MediaMetadata>>>,
     playback_info: Arc<Mutex<Option<PlaybackInfo>>>,
     app_id: String,

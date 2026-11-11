@@ -1,4 +1,5 @@
 #![allow(deprecated)]
+#![allow(unexpected_cfgs)]
 
 use crate::models::*;
 use std::error::Error as StdError;
