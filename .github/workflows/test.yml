@@ -27,12 +27,19 @@ jobs:
       - name: install dependencies
         if: startsWith(matrix.platform, 'ubuntu')
         run: |
+          sudo bash -c 'cat << "EOF" > /etc/resolv.conf
+          nameserver 1.1.1.1
+          nameserver 8.8.8.8
+          nameserver 8.8.4.4
+          options timeout:2 attempts:3
+          EOF'
           echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
           echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-retries
+          sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' /etc/apt/sources.list /etc/apt/apt-mirrors.txt 2>/dev/null || true
           sudo mkdir -p /etc/needrestart/conf.d
           echo '$nrconf{restart} = "l";' | sudo tee /etc/needrestart/conf.d/99no-prompt.conf
           sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get update
-          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" libdbus-1-dev
+          sudo DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=l apt-get install -y --no-install-recommends libdbus-1-dev
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         env:
