@@ -408,57 +408,78 @@ impl super::MediaController for WindowsMediaController {
 
             // Fall back to system-wide media info
             if let Ok(Some(session)) = Self::get_global_session() {
-                if let Ok(media_properties) = session.TryGetMediaPropertiesAsync()?.get() {
-                    let title = media_properties.Title()?.to_string();
-                    let artist = media_properties.Artist()?.to_string();
-                    let album_artist = media_properties.AlbumArtist()?.to_string();
-                    let album_title = media_properties.AlbumTitle()?.to_string();
+                if let Ok(async_op) = session.TryGetMediaPropertiesAsync() {
+                    if let Ok(media_properties) = async_op.get() {
+                        let title = media_properties
+                            .Title()
+                            .map(|s| s.to_string())
+                            .unwrap_or_default();
+                        let artist = media_properties
+                            .Artist()
+                            .map(|s| s.to_string())
+                            .unwrap_or_default();
+                        let album_artist = media_properties
+                            .AlbumArtist()
+                            .map(|s| s.to_string())
+                            .unwrap_or_default();
+                        let album_title = media_properties
+                            .AlbumTitle()
+                            .map(|s| s.to_string())
+                            .unwrap_or_default();
 
-                    // Try to get artwork
-                    let mut artwork_data = None;
-                    if let Ok(thumbnail) = media_properties.Thumbnail() {
-                        if let Ok(stream) = thumbnail.OpenReadAsync()?.get() {
-                            use windows::Storage::Streams::DataReader;
+                        // Try to get artwork
+                        let mut artwork_data = None;
+                        if let Ok(thumbnail) = media_properties.Thumbnail() {
+                            if let Ok(async_op) = thumbnail.OpenReadAsync() {
+                                if let Ok(stream) = async_op.get() {
+                                    use windows::Storage::Streams::DataReader;
 
-                            let size = stream.Size()?;
-                            if size > 0 && size < 10_000_000 {
-                                // Limit to 10MB
-                                let reader = DataReader::CreateDataReader(&stream)?;
-                                reader.LoadAsync(size as u32)?.get()?;
-
-                                let mut buffer = vec![0u8; size as usize];
-                                reader.ReadBytes(&mut buffer)?;
-                                artwork_data = Some(buffer);
+                                    if let Ok(size) = stream.Size() {
+                                        if size > 0 && size < 10_000_000 {
+                                            // Limit to 10MB
+                                            if let Ok(reader) = DataReader::CreateDataReader(&stream) {
+                                                if let Ok(load_op) = reader.LoadAsync(size as u32) {
+                                                    if load_op.get().is_ok() {
+                                                        let mut buffer = vec![0u8; size as usize];
+                                                        if reader.ReadBytes(&mut buffer).is_ok() {
+                                                            artwork_data = Some(buffer);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
 
-                    if !title.is_empty() || !artist.is_empty() {
-                        return Ok(Some(MediaMetadata {
-                            title: if title.is_empty() {
-                                "Unknown".to_string()
-                            } else {
-                                title
-                            },
-                            artist: if artist.is_empty() {
-                                None
-                            } else {
-                                Some(artist)
-                            },
-                            album: if album_title.is_empty() {
-                                None
-                            } else {
-                                Some(album_title)
-                            },
-                            album_artist: if album_artist.is_empty() {
-                                None
-                            } else {
-                                Some(album_artist)
-                            },
-                            artwork_url: None,
-                            artwork_data,
-                            duration: None,
-                        }));
+                        if !title.is_empty() || !artist.is_empty() {
+                            return Ok(Some(MediaMetadata {
+                                title: if title.is_empty() {
+                                    "Unknown".to_string()
+                                } else {
+                                    title
+                                },
+                                artist: if artist.is_empty() {
+                                    None
+                                } else {
+                                    Some(artist)
+                                },
+                                album: if album_title.is_empty() {
+                                    None
+                                } else {
+                                    Some(album_title)
+                                },
+                                album_artist: if album_artist.is_empty() {
+                                    None
+                                } else {
+                                    Some(album_artist)
+                                },
+                                artwork_url: None,
+                                artwork_data,
+                                duration: None,
+                            }));
+                        }
                     }
                 }
             }
@@ -478,26 +499,49 @@ impl super::MediaController for WindowsMediaController {
             // Fall back to system-wide playback info
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(playback_info) = session.GetPlaybackInfo() {
-                    let status = match playback_info.PlaybackStatus()? {
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing => {
-                            PlaybackStatus::Playing
-                        }
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Paused => {
-                            PlaybackStatus::Paused
-                        }
-                        _ => PlaybackStatus::Stopped,
-                    };
+                    let status = playback_info
+                        .PlaybackStatus()
+                        .map(|s| match s {
+                            GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing => {
+                                PlaybackStatus::Playing
+                            }
+                            GlobalSystemMediaTransportControlsSessionPlaybackStatus::Paused => {
+                                PlaybackStatus::Paused
+                            }
+                            _ => PlaybackStatus::Stopped,
+                        })
+                        .unwrap_or(PlaybackStatus::Stopped);
 
-                    let playback_rate = playback_info.PlaybackRate()?.Value().unwrap_or(1.0);
-                    let is_shuffle = playback_info.IsShuffleActive()?.Value().unwrap_or(false);
-                    let repeat_mode = if let Ok(mode) = playback_info.AutoRepeatMode() {
-                        match mode.Value().unwrap_or(MediaPlaybackAutoRepeatMode::None) {
+                    let playback_rate = playback_info
+                        .PlaybackRate()
+                        .ok()
+                        .and_then(|r| r.Value().ok())
+                        .unwrap_or(1.0);
+
+                    let is_shuffle = playback_info
+                        .IsShuffleActive()
+                        .ok()
+                        .and_then(|s| s.Value().ok())
+                        .unwrap_or(false);
+
+                    let repeat_mode = playback_info
+                        .AutoRepeatMode()
+                        .ok()
+                        .and_then(|mode| mode.Value().ok())
+                        .map(|m| match m {
                             MediaPlaybackAutoRepeatMode::Track => RepeatMode::Track,
                             MediaPlaybackAutoRepeatMode::List => RepeatMode::List,
                             _ => RepeatMode::None,
-                        }
+                        })
+                        .unwrap_or(RepeatMode::None);
+
+                    let position = if let Ok(timeline) = session.GetTimelineProperties() {
+                        timeline
+                            .Position()
+                            .map(|p| p.Duration as f64 / 10_000_000.0)
+                            .unwrap_or(0.0)
                     } else {
-                        RepeatMode::None
+                        0.0
                     };
 
                     return Ok(Some(PlaybackInfo {
@@ -505,7 +549,7 @@ impl super::MediaController for WindowsMediaController {
                         shuffle: is_shuffle,
                         repeat_mode,
                         playback_rate,
-                        position: 0.0, // Will be set by get_position
+                        position,
                     }));
                 }
             }
@@ -525,15 +569,17 @@ impl super::MediaController for WindowsMediaController {
             // Fall back to system-wide playback status
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(playback_info) = session.GetPlaybackInfo() {
-                    return Ok(match playback_info.PlaybackStatus()? {
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing => {
-                            PlaybackStatus::Playing
-                        }
-                        GlobalSystemMediaTransportControlsSessionPlaybackStatus::Paused => {
-                            PlaybackStatus::Paused
-                        }
-                        _ => PlaybackStatus::Stopped,
-                    });
+                    if let Ok(status) = playback_info.PlaybackStatus() {
+                        return Ok(match status {
+                            GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing => {
+                                PlaybackStatus::Playing
+                            }
+                            GlobalSystemMediaTransportControlsSessionPlaybackStatus::Paused => {
+                                PlaybackStatus::Paused
+                            }
+                            _ => PlaybackStatus::Stopped,
+                        });
+                    }
                 }
             }
         }
@@ -556,8 +602,9 @@ impl super::MediaController for WindowsMediaController {
             // Fall back to system-wide position
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(timeline) = session.GetTimelineProperties() {
-                    let position_ms = timeline.Position()?.Duration;
-                    return Ok(position_ms as f64 / 10_000_000.0); // Convert from 100ns units to seconds
+                    if let Ok(position) = timeline.Position() {
+                        return Ok(position.Duration as f64 / 10_000_000.0); // Convert from 100ns units to seconds
+                    }
                 }
             }
         }
@@ -626,5 +673,10 @@ mod tests {
         let clear_res = controller.clear_metadata();
         println!("clear_metadata result: {:?}", clear_res);
         assert!(clear_res.is_ok());
+
+        let fresh_controller = WindowsMediaController::new();
+        let info_res = fresh_controller.get_playback_info();
+        println!("fresh get_playback_info result: {:?}", info_res);
+        assert!(info_res.is_ok());
     }
 }
