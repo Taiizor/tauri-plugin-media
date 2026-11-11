@@ -304,17 +304,27 @@ impl super::MediaController for WindowsMediaController {
             };
             controls.SetPlaybackStatus(media_status)?;
 
-            if let Some(mut info) = self.playback_info.clone() {
-                info.status = status;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status,
+                position: 0.0,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.status = status;
+            self.playback_info = Some(info);
         }
         #[cfg(not(target_os = "windows"))]
         {
-            if let Some(mut info) = self.playback_info.clone() {
-                info.status = status;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status,
+                position: 0.0,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.status = status;
+            self.playback_info = Some(info);
         }
         Ok(())
     }
@@ -337,17 +347,27 @@ impl super::MediaController for WindowsMediaController {
                 }
             }
 
-            if let Some(mut info) = self.playback_info.clone() {
-                info.position = position;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status: PlaybackStatus::Stopped,
+                position,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.position = position;
+            self.playback_info = Some(info);
         }
         #[cfg(not(target_os = "windows"))]
         {
-            if let Some(mut info) = self.playback_info.clone() {
-                info.position = position;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status: PlaybackStatus::Stopped,
+                position,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.position = position;
+            self.playback_info = Some(info);
         }
         Ok(())
     }
@@ -360,10 +380,12 @@ impl super::MediaController for WindowsMediaController {
             updater.ClearAll()?;
             updater.Update()?;
             self.metadata = None;
+            self.playback_info = None;
         }
         #[cfg(not(target_os = "windows"))]
         {
             self.metadata = None;
+            self.playback_info = None;
         }
         Ok(())
     }
@@ -379,7 +401,12 @@ impl super::MediaController for WindowsMediaController {
     fn get_metadata(&self) -> Result<Option<MediaMetadata>, Box<dyn StdError>> {
         #[cfg(target_os = "windows")]
         {
-            // Try to get system-wide media info first
+            // If our own metadata is set, prefer it
+            if self.metadata.is_some() {
+                return Ok(self.metadata.clone());
+            }
+
+            // Fall back to system-wide media info
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(media_properties) = session.TryGetMediaPropertiesAsync()?.get() {
                     let title = media_properties.Title()?.to_string();
@@ -443,7 +470,12 @@ impl super::MediaController for WindowsMediaController {
     fn get_playback_info(&self) -> Result<Option<PlaybackInfo>, Box<dyn StdError>> {
         #[cfg(target_os = "windows")]
         {
-            // Try to get system-wide playback info
+            // If our own playback info is set, prefer it
+            if self.playback_info.is_some() {
+                return Ok(self.playback_info.clone());
+            }
+
+            // Fall back to system-wide playback info
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(playback_info) = session.GetPlaybackInfo() {
                     let status = match playback_info.PlaybackStatus()? {
@@ -485,7 +517,12 @@ impl super::MediaController for WindowsMediaController {
     fn get_playback_status(&self) -> Result<PlaybackStatus, Box<dyn StdError>> {
         #[cfg(target_os = "windows")]
         {
-            // Try to get system-wide playback status
+            // If our own playback status is set, prefer it
+            if let Some(ref info) = self.playback_info {
+                return Ok(info.status);
+            }
+
+            // Fall back to system-wide playback status
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(playback_info) = session.GetPlaybackInfo() {
                     return Ok(match playback_info.PlaybackStatus()? {
@@ -511,7 +548,12 @@ impl super::MediaController for WindowsMediaController {
     fn get_position(&self) -> Result<f64, Box<dyn StdError>> {
         #[cfg(target_os = "windows")]
         {
-            // Try to get system-wide position
+            // If our own position is set, prefer it
+            if let Some(ref info) = self.playback_info {
+                return Ok(info.position);
+            }
+
+            // Fall back to system-wide position
             if let Ok(Some(session)) = Self::get_global_session() {
                 if let Ok(timeline) = session.GetTimelineProperties() {
                     let position_ms = timeline.Position()?.Duration;

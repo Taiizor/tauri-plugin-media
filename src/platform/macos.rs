@@ -253,17 +253,27 @@ impl super::MediaController for MacOSMediaController {
                 }
             }
 
-            if let Some(mut info) = self.playback_info.clone() {
-                info.status = status;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status,
+                position: 0.0,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.status = status;
+            self.playback_info = Some(info);
         }
         #[cfg(not(target_os = "macos"))]
         {
-            if let Some(mut info) = self.playback_info.clone() {
-                info.status = status;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status,
+                position: 0.0,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.status = status;
+            self.playback_info = Some(info);
         }
         Ok(())
     }
@@ -287,17 +297,27 @@ impl super::MediaController for MacOSMediaController {
                 }
             }
 
-            if let Some(mut info) = self.playback_info.clone() {
-                info.position = position;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status: PlaybackStatus::Stopped,
+                position,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.position = position;
+            self.playback_info = Some(info);
         }
         #[cfg(not(target_os = "macos"))]
         {
-            if let Some(mut info) = self.playback_info.clone() {
-                info.position = position;
-                self.playback_info = Some(info);
-            }
+            let mut info = self.playback_info.clone().unwrap_or(PlaybackInfo {
+                status: PlaybackStatus::Stopped,
+                position,
+                shuffle: false,
+                repeat_mode: RepeatMode::None,
+                playback_rate: 1.0,
+            });
+            info.position = position;
+            self.playback_info = Some(info);
         }
         Ok(())
     }
@@ -311,10 +331,12 @@ impl super::MediaController for MacOSMediaController {
             }
 
             self.metadata = None;
+            self.playback_info = None;
         }
         #[cfg(not(target_os = "macos"))]
         {
             self.metadata = None;
+            self.playback_info = None;
         }
         Ok(())
     }

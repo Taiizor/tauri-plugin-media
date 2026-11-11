@@ -573,24 +573,33 @@ impl super::MediaController for LinuxMediaController {
 
     fn set_playback_status(&mut self, status: PlaybackStatus) -> Result<(), Box<dyn StdError>> {
         let current_info = self.playback_info.lock().unwrap().clone();
-        if let Some(mut info) = current_info {
-            info.status = status;
-            self.set_playback_info(info)?;
-        }
-        Ok(())
+        let mut info = current_info.unwrap_or(PlaybackInfo {
+            status,
+            position: 0.0,
+            shuffle: false,
+            repeat_mode: RepeatMode::None,
+            playback_rate: 1.0,
+        });
+        info.status = status;
+        self.set_playback_info(info)
     }
 
     fn set_position(&mut self, position: f64) -> Result<(), Box<dyn StdError>> {
         let current_info = self.playback_info.lock().unwrap().clone();
-        if let Some(mut info) = current_info {
-            info.position = position;
-            self.set_playback_info(info)?;
-        }
-        Ok(())
+        let mut info = current_info.unwrap_or(PlaybackInfo {
+            status: PlaybackStatus::Stopped,
+            position,
+            shuffle: false,
+            repeat_mode: RepeatMode::None,
+            playback_rate: 1.0,
+        });
+        info.position = position;
+        self.set_playback_info(info)
     }
 
     fn clear_metadata(&mut self) -> Result<(), Box<dyn StdError>> {
         *self.metadata.lock().unwrap() = None;
+        *self.playback_info.lock().unwrap() = None;
 
         #[cfg(target_os = "linux")]
         {
