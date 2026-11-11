@@ -101,3 +101,64 @@ pub struct InitializeMediaSessionRequest {
     pub app_id: String,
     pub app_name: String,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_media_metadata_serialization() {
+        let metadata = MediaMetadata {
+            title: "Test Song".to_string(),
+            artist: Some("Test Artist".to_string()),
+            album: Some("Test Album".to_string()),
+            album_artist: Some("Test Album Artist".to_string()),
+            duration: Some(180.5),
+            artwork_url: Some("https://example.com/cover.jpg".to_string()),
+            artwork_data: Some(vec![1, 2, 3, 4, 5]),
+        };
+
+        let json = serde_json::to_string(&metadata).unwrap();
+        assert!(json.contains("\"title\":\"Test Song\""));
+        assert!(json.contains("\"artist\":\"Test Artist\""));
+        assert!(json.contains("\"artworkData\":\"AQIDBAU=\""));
+
+        let deserialized: MediaMetadata = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.title, "Test Song");
+        assert_eq!(deserialized.artist.as_deref(), Some("Test Artist"));
+        assert_eq!(deserialized.artwork_data, Some(vec![1, 2, 3, 4, 5]));
+    }
+
+    #[test]
+    fn test_playback_info_serialization() {
+        let info = PlaybackInfo {
+            status: PlaybackStatus::Playing,
+            position: 45.2,
+            shuffle: true,
+            repeat_mode: RepeatMode::Track,
+            playback_rate: 1.0,
+        };
+
+        let json = serde_json::to_string(&info).unwrap();
+        assert!(json.contains("\"status\":\"playing\""));
+        assert!(json.contains("\"repeatMode\":\"track\""));
+        assert!(json.contains("\"shuffle\":true"));
+
+        let deserialized: PlaybackInfo = serde_json::from_str(&json).unwrap();
+        assert_eq!(deserialized.status, PlaybackStatus::Playing);
+        assert_eq!(deserialized.repeat_mode, RepeatMode::Track);
+        assert!(deserialized.shuffle);
+    }
+
+    #[test]
+    fn test_media_control_event_serialization() {
+        let event = MediaControlEvent {
+            event_type: MediaControlEventType::Play,
+            timestamp: 1700000000,
+        };
+
+        let json = serde_json::to_string(&event).unwrap();
+        assert!(json.contains("\"eventType\":\"play\""));
+        assert!(json.contains("\"timestamp\":1700000000"));
+    }
+}
